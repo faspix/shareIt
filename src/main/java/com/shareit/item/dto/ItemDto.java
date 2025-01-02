@@ -1,5 +1,7 @@
 package com.shareit.item.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,12 +11,14 @@ import lombok.Data;
 @Builder
 public class ItemDto {
 
-//    private final Long id;
+    private final Long id;
 
+    @NotBlank(message = "Name shouldn't be blank")
     private final String name;
 
     private final String description;
 
+    @NotNull(message = "Available status shouldn't be null")
     private final Boolean available;
 
 //    private final Long ownerId;

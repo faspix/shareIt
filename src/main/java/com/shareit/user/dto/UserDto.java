@@ -1,8 +1,8 @@
 package com.shareit.user.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 
 @Data
@@ -12,10 +12,13 @@ public class UserDto {
 
 //    private final Long id;
 
-    private final String name;
+    @NotBlank(message = "Name shouldn't be blank")
+    private String name;
 
-    private final String email;
 
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email shouldn't be blank")
+    private String email;
 
 
 }

@@ -3,10 +3,13 @@ package com.shareit.item;
 import com.shareit.item.dto.ItemDto;
 import com.shareit.item.model.Item;
 import com.shareit.item.service.ItemService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -25,7 +28,7 @@ public class ItemController {
     @PostMapping
     public ItemDto addItem(
             @RequestHeader(name = SHARER_USER_ID) Long userId,
-            @RequestBody ItemDto itemDto
+            @RequestBody @Valid ItemDto itemDto
     ) {
         return itemService.addItem(userId, itemDto);
     }
@@ -33,9 +36,10 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto editItem( // ResponseEntity<HttpStatus>
             @RequestHeader(name = SHARER_USER_ID) Long userId,
-            @PathVariable Long itemId
+            @PathVariable Long itemId,
+            @RequestBody @Valid ItemDto itemDto
     ) {
-        return itemService.editItem(userId, itemId); // ResponseEntity.ok(HttpStatus.OK)
+        return itemService.editItem(userId, itemId, itemDto); // ResponseEntity.ok(HttpStatus.OK)
     }
 
     @GetMapping("/{itemId}")
@@ -47,14 +51,14 @@ public class ItemController {
     }
 
     @GetMapping
-    public Set<ItemDto> getAllUsersItems(
+    public List<ItemDto> getAllUsersItems(
             @RequestHeader(name = SHARER_USER_ID) Long userId
     ) {
         return itemService.getAllUsersItems(userId);
     }
 
     @GetMapping("/search")
-    public Set<ItemDto> findItems(
+    public List<ItemDto> findItems(
            // @RequestHeader(name = SHARER_USER_ID) Long userId,
            @RequestParam String text
     ) {

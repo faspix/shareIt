@@ -1,6 +1,9 @@
 package com.shareit.item.model;
 
+import com.shareit.user.model.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,16 +22,19 @@ public class Item {
     @Column(name = "item_id")
     private Long id;
 
+    @NotBlank(message = "Name shouldn't be blank")
     @Column(nullable = false)
     private String name;
 
     private String description;
 
+    @NotNull(message = "Available status shouldn't be null")
     @Column(nullable = false)
     private Boolean available;
 
-    @Column(name = "owner_id", nullable = false)
-    private Long ownerId;
+    @ManyToOne
+    @JoinColumn(name = "owner_id", referencedColumnName = "user_id", nullable = false)
+    private User owner;
 
 
 

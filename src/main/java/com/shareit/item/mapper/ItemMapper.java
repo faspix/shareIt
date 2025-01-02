@@ -5,7 +5,7 @@ import com.shareit.item.model.Item;
 
 public class ItemMapper {
 
-    public Item getItemModel(ItemDto itemDto) {
+    public static Item mapItemDtoToItem(ItemDto itemDto) {
         return Item.builder()
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
@@ -13,8 +13,9 @@ public class ItemMapper {
                 .build();
     }
 
-    public ItemDto getItemDto(Item item) {
+    public static ItemDto mapItemToItemDto(Item item) {
         return ItemDto.builder()
+                .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())

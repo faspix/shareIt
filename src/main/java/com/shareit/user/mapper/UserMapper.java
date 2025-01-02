@@ -5,14 +5,14 @@ import com.shareit.user.model.User;
 
 public class UserMapper {
 
-    public User getUserModel(UserDto userDto) {
+    public static User mapDtoToUser(UserDto userDto) {
         return User.builder()
                 .email(userDto.getEmail())
                 .name(userDto.getName())
                 .build();
     }
 
-    public UserDto getUserDto(User user) {
+    public static UserDto mapUserToDto(User user) {
         return UserDto.builder()
                 .email(user.getEmail())
                 .name(user.getName())

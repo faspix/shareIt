@@ -9,6 +9,6 @@ public class ExceptionResponse {
 
     private final String error;
 
-    private final String description;
+//    private final String description;
 
 }
