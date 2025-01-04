@@ -8,16 +8,15 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @Builder
-public class UserDto {
+public class ResponseUserDto {
 
-//    private final Long id;
+    private Long id;
 
     @NotBlank(message = "Name shouldn't be blank")
     private String name;
 
-
-    @Email(message = "Email should be valid")
     @NotBlank(message = "Email shouldn't be blank")
+    @Email(message = "Email should be valid")
     private String email;
 
 

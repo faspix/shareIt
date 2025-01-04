@@ -9,9 +9,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-public class ItemDto {
-
-    private final Long id;
+public class RequestItemDto{
 
     @NotBlank(message = "Name shouldn't be blank")
     private final String name;
@@ -20,8 +18,6 @@ public class ItemDto {
 
     @NotNull(message = "Available status shouldn't be null")
     private final Boolean available;
-
-//    private final Long ownerId;
 
 
 }

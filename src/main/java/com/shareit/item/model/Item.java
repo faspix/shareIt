@@ -22,13 +22,11 @@ public class Item {
     @Column(name = "item_id")
     private Long id;
 
-    @NotBlank(message = "Name shouldn't be blank")
     @Column(nullable = false)
     private String name;
 
     private String description;
 
-    @NotNull(message = "Available status shouldn't be null")
     @Column(nullable = false)
     private Boolean available;
 

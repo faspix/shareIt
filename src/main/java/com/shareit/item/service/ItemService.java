@@ -1,22 +1,22 @@
 package com.shareit.item.service;
 
-import com.shareit.item.dto.ItemDto;
-import com.shareit.item.model.Item;
+import com.shareit.item.dto.RequestItemDto;
+import com.shareit.item.dto.ResponseItemDto;
 
 import java.util.List;
-import java.util.Set;
 
 public interface ItemService {
 
-    ItemDto addItem(Long userId, ItemDto item);
+    ResponseItemDto addItem(Long userId, RequestItemDto item);
 
-    ItemDto editItem(Long userId, Long itemId, ItemDto itemDto);
+    ResponseItemDto editItem(Long userId, Long itemId, RequestItemDto itemDto);
 
-    ItemDto getItem(Long userId, Long itemId);
+    ResponseItemDto getItem(Long itemId);
 
-    List<ItemDto> getAllUsersItems(Long userId);
+    List<ResponseItemDto> getAllUsersItems(Long userId);
 
-    List<ItemDto> findItems(String text);
+    List<ResponseItemDto> findItems(String text);
 
+    void deleteItem(Long userId, Long itemId);
 }
 

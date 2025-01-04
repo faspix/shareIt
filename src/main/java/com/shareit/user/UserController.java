@@ -1,15 +1,12 @@
 package com.shareit.user;
 
-import com.shareit.user.model.User;
+import com.shareit.user.dto.RequestUserDto;
+import com.shareit.user.dto.ResponseUserDto;
 import com.shareit.user.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -24,43 +21,43 @@ public class UserController {
     }
 
     @PostMapping
-    public User addUser(
+    public ResponseUserDto addUser(
 //            @RequestHeader(name = SHARER_USER_ID) Long userId,
-            @RequestBody @Valid User user
+            @RequestBody @Valid RequestUserDto userDto
     ) {
-        return userService.addUser(user);
+        return userService.addUser(userDto);
     }
 
-    @PatchMapping()
-    public User editUser(
+    @PatchMapping
+    public ResponseUserDto editUser(
             @RequestHeader(name = SHARER_USER_ID) Long userId,
-            @RequestBody @Valid User user
+            @RequestBody @Valid RequestUserDto userDto
     ) {
-        return userService.editUser(userId, user);
+        return userService.editUser(userId, userDto);
     }
 
     @DeleteMapping
-    public ResponseEntity<HttpStatus> delUser(
+    public void delUser(
             @RequestHeader(name = SHARER_USER_ID) Long userId
     ) {
-        return userService.delUser(userId);
+        userService.deleleUser(userId);
     }
 
     @GetMapping("/{userId}")
-    public User getUser(
+    public ResponseUserDto getUser(
             @PathVariable Long userId
     ) {
         return userService.getUser(userId);
     }
 
     @GetMapping
-    public List<User> getAllUsers(
+    public List<ResponseUserDto> getAllUsers(
             @RequestHeader(name = SHARER_USER_ID) Long userId
     ) {
         return userService.getAllUsers();
     }
 
 
-
+//TODO: user can send id in userDto
 
 }

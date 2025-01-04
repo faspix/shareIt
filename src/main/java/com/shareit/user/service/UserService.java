@@ -1,19 +1,17 @@
 package com.shareit.user.service;
 
-import com.shareit.user.model.User;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.shareit.user.dto.RequestUserDto;
+import com.shareit.user.dto.ResponseUserDto;
 
 import java.util.List;
-import java.util.Set;
 
 
 public interface UserService {
 
-    User addUser(User user);
-    ResponseEntity<HttpStatus> delUser(Long userId);
-    User getUser(Long userId);
-    List<User> getAllUsers();
-    User editUser(Long userId, User user);
+    ResponseUserDto addUser(RequestUserDto userDto);
+    void deleleUser(Long userId);
+    ResponseUserDto getUser(Long userId);
+    List<ResponseUserDto> getAllUsers();
+    ResponseUserDto editUser(Long userId, RequestUserDto userDto);
 
 }

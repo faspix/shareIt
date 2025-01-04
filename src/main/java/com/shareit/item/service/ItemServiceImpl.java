@@ -1,24 +1,23 @@
 package com.shareit.item.service;
 
 import com.shareit.exception.ItemNotFoundException;
-import com.shareit.exception.UserValidationException;
-import com.shareit.item.dto.ItemDto;
-import com.shareit.item.mapper.ItemMapper;
+import com.shareit.item.dto.RequestItemDto;
+import com.shareit.item.dto.ResponseItemDto;
 import com.shareit.item.model.Item;
 import com.shareit.item.repository.ItemRepository;
+import com.shareit.user.dto.ResponseUserDto;
 import com.shareit.user.model.User;
 import com.shareit.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.shareit.item.mapper.ItemMapper.*;
+import static com.shareit.user.mapper.UserMapper.*;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
@@ -32,15 +31,16 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemDto addItem(Long userId, ItemDto itemDto) {
-        User user = userService.getUser(userId);
-        Item item = mapItemDtoToItem(itemDto);
+    public ResponseItemDto addItem(Long userId, RequestItemDto itemDto) {
+        User user = mapResponseUserDtoToUser(userService.getUser(userId));
+        Item item = mapRequestItemDtoToItem(itemDto);
         item.setOwner(user);
-        return mapItemToItemDto(itemRepository.save(item));
+        return mapItemToResponseItemDto(itemRepository.save(item));
     }
 
     @Override
-    public ItemDto editItem(Long userId, Long itemId, ItemDto itemDto) {
+    @Transactional
+    public ResponseItemDto editItem(Long userId, Long itemId, RequestItemDto itemDto) {
         Item item = (itemRepository.findById(itemId).orElseThrow(
                 () -> new ItemNotFoundException(itemId)
         ));
@@ -51,37 +51,42 @@ public class ItemServiceImpl implements ItemService {
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
 
-        return mapItemToItemDto(itemRepository.save(item));
+        return mapItemToResponseItemDto(itemRepository.save(item));
     }
 
     @Override
-    public ItemDto getItem(Long userId, Long itemId) {
+    public ResponseItemDto getItem(Long itemId) {
         Item item = (itemRepository.findById(itemId).orElseThrow(
                 () -> new ItemNotFoundException(itemId)
         ));
-        validateUser(userId, item.getOwner().getId());
-        return mapItemToItemDto(item);
+        return mapItemToResponseItemDto(item);
     }
 
     @Override
-    public List<ItemDto> getAllUsersItems(Long userId) {
-
-        User user = userService.getUser(userId);
-
+    public List<ResponseItemDto> getAllUsersItems(Long userId) {
+        User user = mapResponseUserDtoToUser(userService.getUser(userId));
         return itemRepository.getAllByOwner(user).stream().toList();
     }
 
     @Override
-    public List<ItemDto> findItems(String text) {
+    public List<ResponseItemDto> findItems(String text) {
+        List<ResponseItemDto> items = itemRepository.findItemsByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(text, text);
+        return items;
+    }
 
-
-
-        return List.of();
+    @Override
+    @Transactional
+    public void deleteItem(Long userId, Long itemId) {
+        Item item = (itemRepository.findById(itemId).orElseThrow(
+                () -> new ItemNotFoundException(itemId)
+        ));
+        validateUser(userId, item.getOwner().getId());
+        itemRepository.deleteById(itemId);
     }
 
 
     private void validateUser(Long userId, Long ItemUserId) {
-        if (userId != ItemUserId)
+        if (! userId.equals(ItemUserId))
             throw new RuntimeException("user does not own this item");
     }
 

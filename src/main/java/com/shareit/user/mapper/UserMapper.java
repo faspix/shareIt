@@ -1,21 +1,32 @@
 package com.shareit.user.mapper;
 
-import com.shareit.user.dto.UserDto;
+import com.shareit.user.dto.RequestUserDto;
+import com.shareit.user.dto.ResponseUserDto;
 import com.shareit.user.model.User;
 
 public class UserMapper {
 
-    public static User mapDtoToUser(UserDto userDto) {
+
+    public static User mapRequestUserDtoToUser(RequestUserDto userDto) {
         return User.builder()
-                .email(userDto.getEmail())
                 .name(userDto.getName())
+                .email(userDto.getEmail())
                 .build();
     }
 
-    public static UserDto mapUserToDto(User user) {
-        return UserDto.builder()
-                .email(user.getEmail())
+    public static ResponseUserDto mapUserToResponseUserDto(User user) {
+        return ResponseUserDto.builder()
+                .id(user.getId())
                 .name(user.getName())
+                .email(user.getEmail())
+                .build();
+    }
+
+    public static User mapResponseUserDtoToUser(ResponseUserDto userDto) {
+        return User.builder()
+                .id(userDto.getId())
+                .name(userDto.getName())
+                .email(userDto.getEmail())
                 .build();
     }
 
