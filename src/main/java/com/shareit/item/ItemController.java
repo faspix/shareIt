@@ -1,7 +1,6 @@
 package com.shareit.item;
 
-import com.shareit.item.dto.RequestItemDto;
-import com.shareit.item.dto.ResponseItemDto;
+import com.shareit.item.dto.*;
 import com.shareit.item.service.ItemService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +46,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ResponseItemDto> getAllUsersItems(
+    public List<OwnerResponseItemDto> getAllUsersItems(
             @RequestHeader(name = SHARER_USER_ID) Long userId
     ) {
         return itemService.getAllUsersItems(userId);
@@ -63,10 +62,18 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ResponseItemDto> findItems(
-           // @RequestHeader(name = SHARER_USER_ID) Long userId,
            @RequestParam(required = false) String text
     ) {
         return itemService.findItems(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public ResponseCommentDto addComment(
+            @RequestHeader(name = SHARER_USER_ID) Long userId,
+            @PathVariable Long itemId,
+            @RequestBody @Valid RequestCommentDto commentDto
+    ) {
+        return itemService.addComment(userId, itemId, commentDto);
     }
 
 }

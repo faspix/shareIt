@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @Builder
-public class ResponseItemDto {
+public class ResponseItemDtoNoComments {
 
     private final Long id;
 
@@ -23,7 +23,5 @@ public class ResponseItemDto {
 
     @NotNull(message = "Available status shouldn't be null")
     private final Boolean available;
-
-    private List<ResponseCommentDto> comments;
 
 }

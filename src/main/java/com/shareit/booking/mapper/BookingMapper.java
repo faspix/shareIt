@@ -1,26 +1,29 @@
 package com.shareit.booking.mapper;
 
-import com.shareit.booking.dto.RquestBookingDto;
+import com.shareit.booking.dto.ResponseBookingDto;
 import com.shareit.booking.dto.RequestBookingDto;
 import com.shareit.booking.model.Booking;
+
+import static com.shareit.item.mapper.ItemMapper.*;
 
 public class BookingMapper {
 
 
-   public static Booking mapDtoToBooking(RquestBookingDto rquestBookingDto) {
+   public static Booking mapResponseDtoToBooking(ResponseBookingDto rquestBookingDto) {
        return Booking.builder()
                .booker(rquestBookingDto.getBooker())
-               .item(rquestBookingDto.getItem())
+               .item(mapResponseItemDtoNoCommentsToItem(rquestBookingDto.getItem()))
                .start(rquestBookingDto.getStart())
                .end(rquestBookingDto.getEnd())
                .build();
    }
 
 
-    public static RquestBookingDto mapBookingToDto(Booking booking) {
-        return RquestBookingDto.builder()
+    public static ResponseBookingDto mapBookingToResponseDto(Booking booking) {
+        if (booking == null) return null;
+        return ResponseBookingDto.builder()
                 .booker(booking.getBooker())
-                .item(booking.getItem())
+                .item(mapItemToResponseItemDtoNoComments(booking.getItem()))
                 .status(booking.getStatus())
                 .id(booking.getId())
                 .start(booking.getStart())

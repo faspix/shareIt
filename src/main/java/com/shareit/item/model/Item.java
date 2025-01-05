@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "items")
 @Data
@@ -34,6 +36,8 @@ public class Item {
     @JoinColumn(name = "owner_id", referencedColumnName = "user_id", nullable = false)
     private User owner;
 
+    @OneToMany(mappedBy = "item")
+    private List<Comment> comments;
 
 
 }

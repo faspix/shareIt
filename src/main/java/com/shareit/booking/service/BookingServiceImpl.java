@@ -1,14 +1,15 @@
 package com.shareit.booking.service;
 
-import com.shareit.booking.dto.RquestBookingDto;
+import com.shareit.booking.dto.ResponseBookingDto;
 import com.shareit.booking.dto.RequestBookingDto;
 import com.shareit.booking.mapper.BookingMapper;
 import com.shareit.booking.model.Booking;
 import com.shareit.booking.repository.BookingRepository;
 import com.shareit.booking.utility.BookingState;
 import com.shareit.booking.utility.BookingStatus;
-import com.shareit.exception.BookingNotFoundException;
-import com.shareit.exception.UserValidationException;
+import com.shareit.exception.NotFoundException;
+import com.shareit.exception.ValidationException;
+import com.shareit.item.model.Item;
 import com.shareit.item.service.ItemService;
 import com.shareit.user.model.User;
 import com.shareit.user.service.UserService;
@@ -39,42 +40,63 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public RquestBookingDto createBooking(Long userId, RequestBookingDto requestDto) {
+    public ResponseBookingDto createBooking(Long userId, RequestBookingDto requestDto) {
+
+        LocalDate startDate = requestDto.getStart();
+        LocalDate endDate = requestDto.getEnd();
+        Item bookedItem = mapResponseItemDtoToItem(itemService.getItem(requestDto.getItemId()));
+
+        if (! bookedItem.getAvailable()) {
+            throw new ValidationException("This item is not available for reservation");
+        }
+
+        List<Booking> existingBooking = bookingRepository
+                .getBookingByItemAndStatusAndStartBetweenOrEndBetween
+                        (bookedItem, BookingStatus.APPROVED, startDate, endDate, startDate, endDate);
+        if (! existingBooking.isEmpty()) {
+            throw new ValidationException("This item is not available for reservation from " + startDate + " to " + endDate);
+        }
+
         Booking booking = mapRequestBookingDtoToBooking(requestDto);
         booking.setBooker(mapResponseUserDtoToUser(userService.getUser(userId)));
-        booking.setItem(mapResponseItemDtoToItem(itemService.getItem(requestDto.getItemId())));
+        booking.setItem(bookedItem);
         booking.setStatus(BookingStatus.WAITING);
         bookingRepository.save(booking);
-        return mapBookingToDto(booking);
+        return mapBookingToResponseDto(booking);
     }
 
     @Override
-    public RquestBookingDto approveBooking(Long userId, Long bookingId, Boolean approvedStatus) {
+    public ResponseBookingDto approveBooking(Long userId, Long bookingId, Boolean approvedStatus) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(
-                () -> new BookingNotFoundException(bookingId)
+                () -> new NotFoundException("Booking with ID " + bookingId + " not found")
         );
+
+        if (! booking.getStatus().equals(BookingStatus.WAITING)) {
+            throw new ValidationException("Booking status is not WAITING. This bookings cannot be updated");
+        }
+
         User owner = booking.getItem().getOwner();
         validateUser(userId, owner.getId());
         booking.setStatus(approvedStatus ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        return mapBookingToDto(bookingRepository.save(booking));
+        return mapBookingToResponseDto(bookingRepository.save(booking));
     }
 
     @Override
-    public RquestBookingDto getBooking(Long userId, Long bookingId) {
+    public ResponseBookingDto getBooking(Long userId, Long bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(
-                () -> new BookingNotFoundException(bookingId)
+                () -> new NotFoundException("Booking with ID " + bookingId + " not found")
         );
 
         if (!booking.getBooker().getId().equals(userId)
                 && !booking.getItem().getOwner().getId().equals(userId)) {
-            throw new UserValidationException("User with ID " + userId + " doesn't own or booked this item");
+            throw new ValidationException("User with ID " + userId + " doesn't own or booked this item");
         }
-        return mapBookingToDto(booking);
+        return mapBookingToResponseDto(booking);
     }
 
     @Override
-    public List<RquestBookingDto> getAllUserBookings (Long userId, BookingState state){
+    public List<ResponseBookingDto> getAllUserBookings (Long userId, BookingState state){
         User booker = mapResponseUserDtoToUser(userService.getUser(userId));
         List<Booking> list = switch (state) {
             case ALL -> bookingRepository
@@ -95,13 +117,13 @@ public class BookingServiceImpl implements BookingService {
         };
 
         return list.stream()
-                .map(BookingMapper::mapBookingToDto)
+                .map(BookingMapper::mapBookingToResponseDto)
                 .toList();
     }
 
 
     @Override
-    public List<RquestBookingDto> getOwnerBookings(Long userId, BookingState state) {
+    public List<ResponseBookingDto> getOwnerBookings(Long userId, BookingState state) {
         User owner = mapResponseUserDtoToUser(userService.getUser(userId));
         List<Booking> list = switch (state) {
             case ALL -> bookingRepository
@@ -121,16 +143,17 @@ public class BookingServiceImpl implements BookingService {
                     .findBookingsByItemOwnerAndStatusOrderByStart(owner, BookingStatus.REJECTED);
         };
 
-
         return list.stream()
-                .map(BookingMapper::mapBookingToDto)
+                .map(BookingMapper::mapBookingToResponseDto)
                 .toList();
     }
 
 
+
+
     private void validateUser(Long userId, Long ItemUserId) {
         if (! userId.equals(ItemUserId))
-            throw new UserValidationException("User ID " + userId + " does not own this item");
+            throw new ValidationException("User ID " + userId + " does not own this item");
     }
 
 }

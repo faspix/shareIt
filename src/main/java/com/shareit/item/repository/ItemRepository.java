@@ -12,11 +12,7 @@ import java.util.Set;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
+    List<Item> getAllByOwner(User owner);
 
-    Set<ResponseItemDto> getAllByOwner(User owner);
-
-
-    List<ResponseItemDto> findItemsByNameContainingIgnoreCase(String text);
-
-    List<ResponseItemDto> findItemsByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String text, String text2);
+    List<Item> findItemsByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String text, String text2);
 }

@@ -1,18 +1,20 @@
 package com.shareit.item.dto;
 
-import com.shareit.item.model.Comment;
+import com.shareit.booking.dto.ResponseBookingDto;
+import com.shareit.booking.model.Booking;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @Builder
-public class ResponseItemDto {
+public class OwnerResponseItemDto {
 
     private final Long id;
 
@@ -24,6 +26,8 @@ public class ResponseItemDto {
     @NotNull(message = "Available status shouldn't be null")
     private final Boolean available;
 
-    private List<ResponseCommentDto> comments;
+    private ResponseBookingDto lastBooking;
+
+    private ResponseBookingDto nextBooking;
 
 }

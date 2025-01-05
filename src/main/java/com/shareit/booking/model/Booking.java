@@ -1,7 +1,9 @@
 package com.shareit.booking.model;
 
 import com.shareit.booking.utility.BookingStatus;
+import com.shareit.item.dto.ResponseItemDto;
 import com.shareit.item.model.Item;
+import com.shareit.item.repository.ItemRepository;
 import com.shareit.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

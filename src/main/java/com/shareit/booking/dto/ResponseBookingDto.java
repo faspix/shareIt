@@ -1,6 +1,8 @@
 package com.shareit.booking.dto;
 
 import com.shareit.booking.utility.BookingStatus;
+import com.shareit.item.dto.ResponseItemDto;
+import com.shareit.item.dto.ResponseItemDtoNoComments;
 import com.shareit.item.model.Item;
 import com.shareit.user.model.User;
 import jakarta.validation.constraints.NotBlank;
@@ -16,7 +18,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RquestBookingDto {
+public class ResponseBookingDto {
 
 
     private Long id;
@@ -24,7 +26,7 @@ public class RquestBookingDto {
     private BookingStatus status;
 
     @NotBlank(message = "Item shouldn't be null")
-    private Item item;
+    private ResponseItemDtoNoComments item;
 
     @NotNull(message = "User shouldn't be null")
     private User booker;

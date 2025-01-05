@@ -1,7 +1,7 @@
 package com.shareit.user.service;
 
+import com.shareit.exception.NotFoundException;
 import com.shareit.exception.UserAlreadyExistException;
-import com.shareit.exception.UserNotFoundException;
 import com.shareit.user.dto.RequestUserDto;
 import com.shareit.user.dto.ResponseUserDto;
 import com.shareit.user.mapper.UserMapper;
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
     public ResponseUserDto getUser(Long userId) {
         return mapUserToResponseUserDto(
                 userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(userId)
+                () -> new NotFoundException("User with ID " + userId + " not found")
         ));
     }
 
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
     public ResponseUserDto editUser(Long userId, RequestUserDto userDto) {
 
         User existUser = userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(userId)
+                () -> new NotFoundException("User with ID " + userId + " not found")
         );
 
 

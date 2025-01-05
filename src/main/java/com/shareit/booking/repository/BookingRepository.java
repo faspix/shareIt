@@ -1,7 +1,10 @@
 package com.shareit.booking.repository;
 
+import com.shareit.booking.dto.ResponseBookingDto;
 import com.shareit.booking.model.Booking;
 import com.shareit.booking.utility.BookingStatus;
+import com.shareit.item.dto.ResponseItemDto;
+import com.shareit.item.model.Item;
 import com.shareit.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -31,4 +34,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBookingsByItemOwnerAndStatusAndStartIsAfterOrderByStart(User owner, BookingStatus bookingStatus, LocalDate now);
 
     List<Booking> findBookingsByItemOwnerAndStatusAndStartIsBeforeAndEndIsAfterOrderByStart(User owner, BookingStatus bookingStatus, LocalDate now, LocalDate now1);
+
+    List<Booking> getBookingByItemAndStatusAndStartBetweenOrEndBetween(Item bookedItem, BookingStatus bookingStatus, LocalDate startDate, LocalDate endDate, LocalDate startDate1, LocalDate endDate1);
+
+    Booking findFirstBookingByItemAndStatusAndStartAfterOrderByStart(Item item, BookingStatus bookingStatus, LocalDate now);
+
+    Booking findFirstBookingByItemAndStatusAndEndBeforeOrderByEndDesc(Item item, BookingStatus bookingStatus, LocalDate now);
+
+    Booking findFirstBookingByBookerAndStatusAndEndBefore(User user, BookingStatus bookingStatus, LocalDate now);
 }

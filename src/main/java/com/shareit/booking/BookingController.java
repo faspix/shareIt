@@ -1,6 +1,6 @@
 package com.shareit.booking;
 
-import com.shareit.booking.dto.RquestBookingDto;
+import com.shareit.booking.dto.ResponseBookingDto;
 import com.shareit.booking.dto.RequestBookingDto;
 import com.shareit.booking.service.BookingService;
 import com.shareit.booking.utility.BookingState;
@@ -23,7 +23,7 @@ public class BookingController {
     }
 
     @PostMapping
-    public RquestBookingDto createBookingBooking(
+    public ResponseBookingDto createBookingBooking(
             @RequestHeader(name = SHARER_USER_ID) Long userId,
             @RequestBody @Valid RequestBookingDto bookingDto
     ) {
@@ -31,7 +31,7 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    public RquestBookingDto approveBooking(
+    public ResponseBookingDto approveBooking(
             @RequestHeader(name = SHARER_USER_ID) Long userId,
             @PathVariable Long bookingId,
             @RequestParam(name = "approved") Boolean approvedStatus
@@ -40,7 +40,7 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public RquestBookingDto getBooking(
+    public ResponseBookingDto getBooking(
             @RequestHeader(name = SHARER_USER_ID) Long userId,
             @PathVariable Long bookingId
     ) {
@@ -48,7 +48,7 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<RquestBookingDto> getAllUserBookings(
+    public List<ResponseBookingDto> getAllUserBookings(
             @RequestHeader(name = SHARER_USER_ID) Long userId,
             @RequestParam(defaultValue = "ALL") BookingState state
     ) {
@@ -56,7 +56,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<RquestBookingDto> getOwnerBookings(
+    public List<ResponseBookingDto> getOwnerBookings(
             @RequestHeader(name = SHARER_USER_ID) Long userId,
             @RequestParam(defaultValue = "ALL") BookingState state
     ) {
