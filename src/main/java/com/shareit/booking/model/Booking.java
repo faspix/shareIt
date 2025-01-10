@@ -39,14 +39,14 @@ public class Booking {
     @JoinColumn(name = "booker_id", referencedColumnName = "user_id")
     private User booker;
 
+
     @Column(name = "start_date")
+//    @Temporal(value = TemporalType.DATE)
     private LocalDate start;
 
     @Column(name = "end_date")
+//    @Temporal(value = TemporalType.DATE)
     private LocalDate end;
-
-//    @Column(name = "creation_date")
-//    private LocalDate creationDate;
 
 
 

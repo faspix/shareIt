@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ItemService {
 
-    ResponseItemDto addItem(Long userId, RequestItemDto item);
+    ResponseItemDtoNoComments addItem(Long userId, RequestItemDto item);
 
     ResponseItemDto editItem(Long userId, Long itemId, RequestItemDto itemDto);
 

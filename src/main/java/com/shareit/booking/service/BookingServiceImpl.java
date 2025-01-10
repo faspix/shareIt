@@ -33,28 +33,35 @@ public class BookingServiceImpl implements BookingService {
 
     private final ItemService itemService;
 
-    public BookingServiceImpl(BookingRepository bookingRepository, UserService userService, ItemService itemService) {
+    public BookingServiceImpl(BookingRepository bookingRepository,
+                              UserService userService,
+                              ItemService itemService) {
         this.bookingRepository = bookingRepository;
         this.userService = userService;
         this.itemService = itemService;
     }
 
     @Override
-    public ResponseBookingDto createBooking(Long userId, RequestBookingDto requestDto) {
+    public ResponseBookingDto createBooking(Long userId,
+                                            RequestBookingDto requestDto) {
 
         LocalDate startDate = requestDto.getStart();
         LocalDate endDate = requestDto.getEnd();
         Item bookedItem = mapResponseItemDtoToItem(itemService.getItem(requestDto.getItemId()));
 
+        if (startDate.isBefore(LocalDate.now()) || endDate.isBefore(LocalDate.now())) {
+            throw new ValidationException("Invalid reservation dates");
+        }
+
         if (! bookedItem.getAvailable()) {
             throw new ValidationException("This item is not available for reservation");
         }
 
-        List<Booking> existingBooking = bookingRepository
-                .getBookingByItemAndStatusAndStartBetweenOrEndBetween
-                        (bookedItem, BookingStatus.APPROVED, startDate, endDate, startDate, endDate);
+        List<Booking> existingBooking = bookingRepository.
+                CheckItemAvailableForBooking(bookedItem, startDate, endDate);
         if (! existingBooking.isEmpty()) {
-            throw new ValidationException("This item is not available for reservation from " + startDate + " to " + endDate);
+            throw new ValidationException("This item is not available for reservation from "
+                    + startDate + " to " + endDate);
         }
 
         Booking booking = mapRequestBookingDtoToBooking(requestDto);
@@ -66,7 +73,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public ResponseBookingDto approveBooking(Long userId, Long bookingId, Boolean approvedStatus) {
+    public ResponseBookingDto approveBooking(Long userId,
+                                             Long bookingId,
+                                             Boolean approvedStatus) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(
                 () -> new NotFoundException("Booking with ID " + bookingId + " not found")
         );
@@ -82,7 +91,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public ResponseBookingDto getBooking(Long userId, Long bookingId) {
+    public ResponseBookingDto getBooking(Long userId,
+                                         Long bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(
                 () -> new NotFoundException("Booking with ID " + bookingId + " not found")
@@ -96,7 +106,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<ResponseBookingDto> getAllUserBookings (Long userId, BookingState state){
+    public List<ResponseBookingDto> getAllUserBookings (Long userId,
+                                                        BookingState state){
         User booker = mapResponseUserDtoToUser(userService.getUser(userId));
         List<Booking> list = switch (state) {
             case ALL -> bookingRepository
@@ -123,7 +134,8 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
-    public List<ResponseBookingDto> getOwnerBookings(Long userId, BookingState state) {
+    public List<ResponseBookingDto> getOwnerBookings(Long userId,
+                                                     BookingState state) {
         User owner = mapResponseUserDtoToUser(userService.getUser(userId));
         List<Booking> list = switch (state) {
             case ALL -> bookingRepository

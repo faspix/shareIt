@@ -21,7 +21,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseItemDto addItem(
+    public ResponseItemDtoNoComments addItem(
             @RequestHeader(name = SHARER_USER_ID) Long userId,
             @RequestBody @Valid RequestItemDto itemDto
     ) {

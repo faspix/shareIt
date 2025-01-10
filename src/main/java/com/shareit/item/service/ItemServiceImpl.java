@@ -11,10 +11,8 @@ import com.shareit.item.model.Comment;
 import com.shareit.item.model.Item;
 import com.shareit.item.repository.CommentRepository;
 import com.shareit.item.repository.ItemRepository;
-import com.shareit.user.dto.ResponseUserDto;
 import com.shareit.user.model.User;
 import com.shareit.user.service.UserService;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +20,6 @@ import static com.shareit.booking.mapper.BookingMapper.mapBookingToResponseDto;
 import static com.shareit.item.mapper.CommentMapper.mapCommentToResponseCommentDto;
 import static com.shareit.item.mapper.ItemMapper.*;
 import static com.shareit.user.mapper.UserMapper.*;
-import static com.shareit.booking.mapper.BookingMapper.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -38,7 +35,10 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
-    public ItemServiceImpl(ItemRepository itemRepository, UserService userService, BookingRepository bookingRepository, CommentRepository commentRepository) {
+    public ItemServiceImpl(ItemRepository itemRepository,
+                           UserService userService,
+                           BookingRepository bookingRepository,
+                           CommentRepository commentRepository) {
         this.itemRepository = itemRepository;
         this.userService = userService;
         this.bookingRepository = bookingRepository;
@@ -47,16 +47,21 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ResponseItemDto addItem(Long userId, RequestItemDto itemDto) {
+    public ResponseItemDtoNoComments addItem(Long userId,
+                                             RequestItemDto itemDto) {
+
         User user = mapResponseUserDtoToUser(userService.getUser(userId));
         Item item = mapRequestItemDtoToItem(itemDto);
         item.setOwner(user);
-        return mapItemToResponseItemDto(itemRepository.save(item));
+        return mapItemToResponseItemDtoNoComments(itemRepository.save(item));
     }
 
     @Override
     @Transactional
-    public ResponseItemDto editItem(Long userId, Long itemId, RequestItemDto itemDto) {
+    public ResponseItemDto editItem(Long userId,
+                                    Long itemId,
+                                    RequestItemDto itemDto) {
+
         Item item = (itemRepository.findById(itemId).orElseThrow(
                 () -> new NotFoundException("Item with ID " + itemId + " not found")
         ));
@@ -84,9 +89,8 @@ public class ItemServiceImpl implements ItemService {
         User user = mapResponseUserDtoToUser(userService.getUser(userId));
         List<Item> items = itemRepository.getAllByOwner(user);
 
-
         return items.stream()
-                .map(ItemMapper::mapItemDtoToOwnerResponseItemDto)
+                .map(ItemMapper::mapItemToOwnerResponseItemDto)
                 .peek(item -> {
                     item.setNextBooking(mapBookingToResponseDto(
                                     bookingRepository
@@ -103,15 +107,12 @@ public class ItemServiceImpl implements ItemService {
                                                             LocalDate.now())
                     ));
                 })
-
                 .toList();
     }
 
 
-
-
     @Override
-    public List<ResponseItemDto> findItems(String text) {
+    public List<ResponseItemDto> findItems(String text) { // TODO:
         List<Item> items = itemRepository.findItemsByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(text, text);
         return items.stream()
                 .map(ItemMapper::mapItemToResponseItemDto)
@@ -120,7 +121,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public void deleteItem(Long userId, Long itemId) {
+    public void deleteItem(Long userId,
+                           Long itemId) {
+
         Item item = (itemRepository.findById(itemId).orElseThrow(
                 () -> new NotFoundException("Item with ID " + itemId + " not found")
         ));
@@ -130,7 +133,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ResponseCommentDto addComment(Long userId, Long itemId, RequestCommentDto commentDto) {
+    public ResponseCommentDto addComment(Long userId,
+                                         Long itemId,
+                                         RequestCommentDto commentDto) {
+
         User user = mapResponseUserDtoToUser(userService.getUser(userId));
         Item item = mapResponseItemDtoToItem(getItem(itemId));
 
@@ -141,7 +147,7 @@ public class ItemServiceImpl implements ItemService {
 
         Booking booking = bookingRepository
                 .findFirstBookingByBookerAndStatusAndEndBefore(user, BookingStatus.APPROVED, LocalDate.now());
-        if (booking != null) {
+        if (booking == null) {
             throw new ValidationException("User ID " + userId + " didn't book this item");
         }
 
@@ -152,7 +158,6 @@ public class ItemServiceImpl implements ItemService {
         comment.setText(commentDto.getText());
 
         commentRepository.save(comment);
-
         return mapCommentToResponseCommentDto(comment);
     }
 

@@ -63,7 +63,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseUserDto editUser(Long userId, RequestUserDto userDto) {
-
         User existUser = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("User with ID " + userId + " not found")
         );
