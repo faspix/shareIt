@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.shareit.booking.mapper.BookingMapper.mapBookingToResponseBookingDto;
+
 
 @RestController
 @RequestMapping(path = "/bookings")
@@ -44,23 +46,27 @@ public class BookingController {
             @RequestHeader(name = SHARER_USER_ID) Long userId,
             @PathVariable Long bookingId
     ) {
-        return bookingService.getBooking(userId, bookingId);
+        return mapBookingToResponseBookingDto(bookingService.getBooking(userId, bookingId));
     }
 
     @GetMapping
     public List<ResponseBookingDto> getAllUserBookings(
             @RequestHeader(name = SHARER_USER_ID) Long userId,
-            @RequestParam(defaultValue = "ALL") BookingState state
+            @RequestParam(defaultValue = "ALL") BookingState state,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size
     ) {
-        return bookingService.getAllUserBookings(userId, state);
+        return bookingService.getAllUserBookings(userId, state, page, size);
     }
 
     @GetMapping("/owner")
     public List<ResponseBookingDto> getOwnerBookings(
             @RequestHeader(name = SHARER_USER_ID) Long userId,
-            @RequestParam(defaultValue = "ALL") BookingState state
+            @RequestParam(defaultValue = "ALL") BookingState state,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size
     ) {
-        return bookingService.getOwnerBookings(userId, state);
+        return bookingService.getOwnerBookings(userId, state, page, size);
     }
 
 

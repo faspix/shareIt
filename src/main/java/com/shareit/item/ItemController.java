@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.shareit.item.mapper.ItemMapper.mapItemToResponseItemDto;
+
 
 @RestController
 @RequestMapping("/items")
@@ -29,42 +31,45 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseItemDto editItem( // ResponseEntity<HttpStatus>
+    public ResponseItemDto editItem(
             @RequestHeader(name = SHARER_USER_ID) Long userId,
             @PathVariable Long itemId,
             @RequestBody @Valid RequestItemDto itemDto
     ) {
-        return itemService.editItem(userId, itemId, itemDto); // ResponseEntity.ok(HttpStatus.OK)
+        return itemService.editItem(userId, itemId, itemDto);
     }
 
     @GetMapping("/{itemId}")
     public ResponseItemDto getItem(
-            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @PathVariable Long itemId
     ) {
-        return itemService.getItem(itemId);
+        return mapItemToResponseItemDto(itemService.getItem(itemId));
     }
 
     @GetMapping
     public List<OwnerResponseItemDto> getAllUsersItems(
-            @RequestHeader(name = SHARER_USER_ID) Long userId
+            @RequestHeader(name = SHARER_USER_ID) Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size
     ) {
-        return itemService.getAllUsersItems(userId);
+        return itemService.getAllUsersItems(userId, page, size);
     }
 
     @DeleteMapping("/{itemId}")
-    public void deleteItem(
+    public void deleteItem( // ResponseEntity<HttpStatus>
             @RequestHeader(name = SHARER_USER_ID) Long userId,
             @PathVariable Long itemId
     ) {
-        itemService.deleteItem(userId, itemId);
+        itemService.deleteItem(userId, itemId); // ResponseEntity.ok(HttpStatus.OK)
     }
 
     @GetMapping("/search")
     public List<ResponseItemDto> findItems(
-           @RequestParam(required = false) String text
+           @RequestParam(required = false) String text,
+           @RequestParam(defaultValue = "0") int page,
+           @RequestParam(defaultValue = "30") int size
     ) {
-        return itemService.findItems(text);
+        return itemService.findItems(text, page, size);
     }
 
     @PostMapping("/{itemId}/comment")

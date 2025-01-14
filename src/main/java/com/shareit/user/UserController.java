@@ -2,11 +2,12 @@ package com.shareit.user;
 
 import com.shareit.user.dto.RequestUserDto;
 import com.shareit.user.dto.ResponseUserDto;
-import com.shareit.user.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.shareit.user.mapper.UserMapper.mapUserToResponseUserDto;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -22,7 +23,6 @@ public class UserController {
 
     @PostMapping
     public ResponseUserDto addUser(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @RequestBody @Valid RequestUserDto userDto
     ) {
         return userService.addUser(userDto);
@@ -47,17 +47,16 @@ public class UserController {
     public ResponseUserDto getUser(
             @PathVariable Long userId
     ) {
-        return userService.getUser(userId);
+        return mapUserToResponseUserDto(userService.getUser(userId));
     }
 
     @GetMapping
     public List<ResponseUserDto> getAllUsers(
-            @RequestHeader(name = SHARER_USER_ID) Long userId
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size
+
     ) {
-        return userService.getAllUsers();
+        return userService.getAllUsers(page, size);
     }
-
-
-//TODO: user can send id in userDto
 
 }

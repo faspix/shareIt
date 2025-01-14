@@ -8,18 +8,7 @@ import static com.shareit.item.mapper.ItemMapper.*;
 
 public class BookingMapper {
 
-
-   public static Booking mapResponseDtoToBooking(ResponseBookingDto rquestBookingDto) {
-       return Booking.builder()
-               .booker(rquestBookingDto.getBooker())
-               .item(mapResponseItemDtoNoCommentsToItem(rquestBookingDto.getItem()))
-               .start(rquestBookingDto.getStart())
-               .end(rquestBookingDto.getEnd())
-               .build();
-   }
-
-
-    public static ResponseBookingDto mapBookingToResponseDto(Booking booking) {
+    public static ResponseBookingDto mapBookingToResponseBookingDto(Booking booking) {
         if (booking == null) return null;
         return ResponseBookingDto.builder()
                 .booker(booking.getBooker())

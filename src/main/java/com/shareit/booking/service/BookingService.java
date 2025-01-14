@@ -14,11 +14,11 @@ public interface BookingService {
 
     ResponseBookingDto approveBooking(Long userId, Long bookingId, Boolean approvedStatus);
 
-    ResponseBookingDto getBooking(Long userId, Long bookingId);
+    Booking getBooking(Long userId, Long bookingId);
 
-    List<ResponseBookingDto> getAllUserBookings(Long userId, BookingState state);
+    List<ResponseBookingDto> getAllUserBookings(Long userId, BookingState state, int page, int size);
 
-    List<ResponseBookingDto> getOwnerBookings(Long userId, BookingState state);
+    List<ResponseBookingDto> getOwnerBookings(Long userId, BookingState state, int page, int size);
 
 
 }

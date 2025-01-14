@@ -1,4 +1,4 @@
-package com.shareit.user.service;
+package com.shareit.user;
 
 import com.shareit.exception.NotFoundException;
 import com.shareit.exception.UserAlreadyExistException;
@@ -8,10 +8,13 @@ import com.shareit.user.mapper.UserMapper;
 import com.shareit.user.model.User;
 import com.shareit.user.repository.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.shareit.user.mapper.UserMapper.*;
+import static com.shareit.user.utility.pageRequestMaker.makePageRequest;
 
 import java.util.List;
 
@@ -45,16 +48,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseUserDto getUser(Long userId) {
-        return mapUserToResponseUserDto(
-                userRepository.findById(userId).orElseThrow(
+    public User getUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("User with ID " + userId + " not found")
-        ));
+        );
     }
 
     @Override
-    public List<ResponseUserDto> getAllUsers() {
-        return userRepository.findAll()
+    public List<ResponseUserDto> getAllUsers(int page, int size) {
+        Pageable pageRequest = makePageRequest(page, size);
+        Page<User> allUsers = userRepository.findAll(pageRequest);
+        return allUsers
                 .stream()
                 .map(UserMapper::mapUserToResponseUserDto)
                 .toList();
@@ -63,10 +67,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseUserDto editUser(Long userId, RequestUserDto userDto) {
-        User existUser = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("User with ID " + userId + " not found")
-        );
-
+        User existUser = getUser(userId);
 
         existUser.setEmail(userDto.getEmail());
         existUser.setName(userDto.getName());

@@ -6,6 +6,9 @@ import com.shareit.booking.utility.BookingStatus;
 import com.shareit.item.dto.ResponseItemDto;
 import com.shareit.item.model.Item;
 import com.shareit.user.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,56 +20,63 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    String CheckItemAvailableForBookingSQL = "SELECT b FROM Booking b " +
+    String checkItemAvailableForBookingSQL = "SELECT COUNT(b) FROM Booking b " +
             "WHERE b.item = :item " +
             "AND b.status = 'APPROVED' " +
             "AND ((b.start BETWEEN :startDate AND :endDate) OR (b.end BETWEEN :startDate AND :endDate))";
 
-    @Query(CheckItemAvailableForBookingSQL)
-    List<Booking> CheckItemAvailableForBooking(
+    @Query(checkItemAvailableForBookingSQL)
+    Integer checkItemAvailableForBooking(
             @Param("item") Item item,
             @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate);
+            @Param("endDate") LocalDate endDate
+    );
 
 
 
-    List<Booking> getBookingsByBookerOrderByStartDesc(User booker);
+    Page<Booking> getBookingsByBooker(User booker, Pageable pageRequest);
 
-    List<Booking> getBookingsByBookerAndStatusOrderByStartDesc(User booker,
-                                                               BookingStatus bookingStatus);
+    Page<Booking> getBookingsByBookerAndStatus(User booker,
+                                                               BookingStatus bookingStatus,
+                                                               Pageable pageRequest);
 
-    List<Booking> getBookingsByBookerAndStatusAndStartIsAfterOrderByStartDesc(User booker,
+    Page<Booking> getBookingsByBookerAndStatusAndStartIsAfter(User booker,
                                                                               BookingStatus bookingStatus,
-                                                                              LocalDate now);
+                                                                              LocalDate now,
+                                                                              Pageable pageRequest);
 
-    List<Booking> getBookingsByBookerAndStatusAndEndIsBeforeOrderByStartDesc(User booker,
+    Page<Booking> getBookingsByBookerAndStatusAndEndIsBefore(User booker,
                                                                              BookingStatus bookingStatus,
-                                                                             LocalDate now);
+                                                                             LocalDate now,
+                                                                             Pageable pageRequest);
 
-    List<Booking> getBookingsByBookerAndStatusAndStartIsBeforeAndEndIsAfterOrderByStartDesc(User booker,
+    Page<Booking> getBookingsByBookerAndStatusAndStartIsBeforeAndEndIsAfter(User booker,
                                                                                             BookingStatus bookingStatus,
                                                                                             LocalDate now,
-                                                                                            LocalDate now1);
+                                                                                            LocalDate now1,
+                                                                                            Pageable pageRequest);
 
-    List<Booking> findBookingsByItemOwnerOrderByStart(User owner);
+    Page<Booking> findBookingsByItemOwner(User owner, Pageable pageRequest);
 
-    List<Booking> findBookingsByItemOwnerAndStatusOrderByStart(User owner,
-                                                               BookingStatus bookingStatus);
+    Page<Booking> findBookingsByItemOwnerAndStatus(User owner,
+                                                               BookingStatus bookingStatus,
+                                                               Pageable pageRequest);
 
-    List<Booking> findBookingsByItemOwnerAndStatusAndEndIsBeforeOrderByStart(User owner,
+    Page<Booking> findBookingsByItemOwnerAndStatusAndEndIsBefore(User owner,
                                                                              BookingStatus bookingStatus,
-                                                                             LocalDate now);
+                                                                             LocalDate now,
+                                                                             Pageable pageRequest);
 
-    List<Booking> findBookingsByItemOwnerAndStatusAndStartIsAfterOrderByStart(User owner,
+    Page<Booking> findBookingsByItemOwnerAndStatusAndStartIsAfter(User owner,
                                                                               BookingStatus bookingStatus,
-                                                                              LocalDate now);
+                                                                              LocalDate now,
+                                                                              Pageable pageRequest);
 
-    List<Booking> findBookingsByItemOwnerAndStatusAndStartIsBeforeAndEndIsAfterOrderByStart(User owner,
+    Page<Booking> findBookingsByItemOwnerAndStatusAndStartIsBeforeAndEndIsAfter(User owner,
                                                                                             BookingStatus bookingStatus,
                                                                                             LocalDate now,
-                                                                                            LocalDate now1);
-
-
+                                                                                            LocalDate now1,
+                                                                                            Pageable pageRequest);
 
     Booking findFirstBookingByItemAndStatusAndStartAfterOrderByStart(Item item,
                                                                      BookingStatus bookingStatus,

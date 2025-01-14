@@ -6,8 +6,6 @@ import com.shareit.item.dto.ResponseItemDto;
 import com.shareit.item.dto.ResponseItemDtoNoComments;
 import com.shareit.item.model.Item;
 
-import static com.shareit.item.mapper.CommentMapper.mapCommentToResponseCommentDto;
-
 public class ItemMapper {
 
 
@@ -29,16 +27,6 @@ public class ItemMapper {
                         .stream()
                         .map(CommentMapper::mapCommentToResponseCommentDto)
                         .toList()))
-                .build();
-    }
-
-
-    public static Item mapResponseItemDtoToItem(ResponseItemDto itemDto) {
-        return Item.builder()
-                .id(itemDto.getId())
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
                 .build();
     }
 
@@ -66,15 +54,6 @@ public class ItemMapper {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .build();
-    }
-
-    public static Item mapResponseItemDtoNoCommentsToItem(ResponseItemDtoNoComments itemDto) {
-        return Item.builder()
-                .id(itemDto.getId())
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
                 .build();
     }
 

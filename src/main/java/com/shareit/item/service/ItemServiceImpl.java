@@ -12,14 +12,16 @@ import com.shareit.item.model.Item;
 import com.shareit.item.repository.CommentRepository;
 import com.shareit.item.repository.ItemRepository;
 import com.shareit.user.model.User;
-import com.shareit.user.service.UserService;
+import com.shareit.user.UserService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.shareit.booking.mapper.BookingMapper.mapBookingToResponseDto;
+import static com.shareit.booking.mapper.BookingMapper.mapBookingToResponseBookingDto;
 import static com.shareit.item.mapper.CommentMapper.mapCommentToResponseCommentDto;
 import static com.shareit.item.mapper.ItemMapper.*;
-import static com.shareit.user.mapper.UserMapper.*;
+import static com.shareit.user.utility.UserValidator.validateUser;
+import static com.shareit.user.utility.pageRequestMaker.makePageRequest;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -47,10 +49,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ResponseItemDtoNoComments addItem(Long userId,
-                                             RequestItemDto itemDto) {
-
-        User user = mapResponseUserDtoToUser(userService.getUser(userId));
+    public ResponseItemDtoNoComments addItem(Long userId, RequestItemDto itemDto) {
+        User user = userService.getUser(userId);
         Item item = mapRequestItemDtoToItem(itemDto);
         item.setOwner(user);
         return mapItemToResponseItemDtoNoComments(itemRepository.save(item));
@@ -58,14 +58,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ResponseItemDto editItem(Long userId,
-                                    Long itemId,
-                                    RequestItemDto itemDto) {
-
-        Item item = (itemRepository.findById(itemId).orElseThrow(
-                () -> new NotFoundException("Item with ID " + itemId + " not found")
-        ));
-
+    public ResponseItemDto editItem(Long userId, Long itemId, RequestItemDto itemDto) {
+        Item item = getItem(itemId);
         validateUser(userId, item.getOwner().getId());
 
         item.setName(itemDto.getName());
@@ -76,69 +70,75 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ResponseItemDto getItem(Long itemId) {
-        Item item = (itemRepository.findById(itemId).orElseThrow(
+    public Item getItem(Long itemId) {
+        return itemRepository.findById(itemId).orElseThrow(
                 () -> new NotFoundException("Item with ID " + itemId + " not found")
-        ));
-        return mapItemToResponseItemDto(item);
+        );
     }
 
 
     @Override
-    public List<OwnerResponseItemDto> getAllUsersItems(Long userId) {
-        User user = mapResponseUserDtoToUser(userService.getUser(userId));
-        List<Item> items = itemRepository.getAllByOwner(user);
+    public List<OwnerResponseItemDto> getAllUsersItems(Long userId, int page, int size) {
+        User user = userService.getUser(userId);
+
+        Pageable pageRequest = makePageRequest(page, size);
+
+        List<Item> items = itemRepository
+                .getAllByOwner(user, pageRequest)
+                .stream()
+                .toList();
 
         return items.stream()
                 .map(ItemMapper::mapItemToOwnerResponseItemDto)
                 .peek(item -> {
-                    item.setNextBooking(mapBookingToResponseDto(
+                    item.setNextBooking(
+                            mapBookingToResponseBookingDto(
                                     bookingRepository
                                             .findFirstBookingByItemAndStatusAndStartAfterOrderByStart
                                                     (mapOwnerResponseItemDtoToItem(item),
                                                             BookingStatus.APPROVED,
-                                                            LocalDate.now())
-                    ));
-                    item.setLastBooking(mapBookingToResponseDto(
+                                                            LocalDate.now()
+                                                    )
+                            )
+                    );
+                    item.setLastBooking(
+                            mapBookingToResponseBookingDto(
                                     bookingRepository
                                             .findFirstBookingByItemAndStatusAndEndBeforeOrderByEndDesc
                                                     (mapOwnerResponseItemDtoToItem(item),
                                                             BookingStatus.APPROVED,
-                                                            LocalDate.now())
-                    ));
+                                                            LocalDate.now()
+                                                    )
+                            )
+                    );
                 })
                 .toList();
     }
 
 
     @Override
-    public List<ResponseItemDto> findItems(String text) { // TODO:
-        List<Item> items = itemRepository.findItemsByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(text, text);
-        return items.stream()
+    public List<ResponseItemDto> findItems(String text, int page, int size) {
+        Pageable requestPage = makePageRequest(page, size);
+        return itemRepository
+                .searchItems(text, requestPage)
+                .stream()
                 .map(ItemMapper::mapItemToResponseItemDto)
                 .toList();
     }
 
     @Override
     @Transactional
-    public void deleteItem(Long userId,
-                           Long itemId) {
-
-        Item item = (itemRepository.findById(itemId).orElseThrow(
-                () -> new NotFoundException("Item with ID " + itemId + " not found")
-        ));
+    public void deleteItem(Long userId, Long itemId) {
+        Item item = getItem(itemId);
         validateUser(userId, item.getOwner().getId());
         itemRepository.deleteById(itemId);
     }
 
     @Override
     @Transactional
-    public ResponseCommentDto addComment(Long userId,
-                                         Long itemId,
-                                         RequestCommentDto commentDto) {
-
-        User user = mapResponseUserDtoToUser(userService.getUser(userId));
-        Item item = mapResponseItemDtoToItem(getItem(itemId));
+    public ResponseCommentDto addComment(Long userId, Long itemId, RequestCommentDto commentDto) {
+        User user = userService.getUser(userId);
+        Item item = getItem(itemId);
 
         Comment existingComment = commentRepository.findFirstCommentByAuthorAndItem(user, item);
         if (existingComment != null) {
@@ -152,7 +152,6 @@ public class ItemServiceImpl implements ItemService {
         }
 
         Comment comment = new Comment();
-
         comment.setItem(item);
         comment.setAuthor(user);
         comment.setText(commentDto.getText());
@@ -162,10 +161,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-    private void validateUser(Long userId, Long ItemUserId) {
-        if (! userId.equals(ItemUserId))
-            throw new ValidationException("User ID " + userId + " does not own this item");
-    }
 
 }
 

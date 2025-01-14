@@ -1,6 +1,7 @@
 package com.shareit.item.service;
 
 import com.shareit.item.dto.*;
+import com.shareit.item.model.Item;
 
 import java.util.List;
 
@@ -10,11 +11,11 @@ public interface ItemService {
 
     ResponseItemDto editItem(Long userId, Long itemId, RequestItemDto itemDto);
 
-    ResponseItemDto getItem(Long itemId);
+    Item getItem(Long itemId);
 
-    List<OwnerResponseItemDto> getAllUsersItems(Long userId);
+    List<OwnerResponseItemDto> getAllUsersItems(Long userId, int page, int size);
 
-    List<ResponseItemDto> findItems(String text);
+    List<ResponseItemDto> findItems(String text, int page, int size);
 
     void deleteItem(Long userId, Long itemId);
 
