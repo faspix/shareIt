@@ -9,16 +9,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-//@ExtendWith(SpringExtension.class)
-//@ContextConfiguration(classes = ShareitApplication.class)
-//@TestPropertySource("classpath:application.properties")
-@SpringBootTest
-@WebMvcTest
-public class userControllerIT {
-
-    @Test
-    void findById() {
-
-    }
-
-}
+////@ExtendWith(SpringExtension.class)
+////@ContextConfiguration(classes = ShareitApplication.class)
+////@TestPropertySource("classpath:application.properties")
+//@SpringBootTest
+//@WebMvcTest
+//public class userControllerIT {
+//
+//    @Test
+//    void findById() {
+//
+//    }
+//
+//}

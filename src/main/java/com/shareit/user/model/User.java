@@ -1,28 +1,26 @@
 package com.shareit.user.model;
 
-import com.shareit.item.model.Item;
+import com.shareit.common.model.AuditingModel;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
-
-import java.util.List;
+import lombok.*;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @NoArgsConstructor
 @Entity
 @Builder
 @AllArgsConstructor
+//@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+@Audited
 @Table(name = "users")
-public class User {
+public class User extends AuditingModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false)

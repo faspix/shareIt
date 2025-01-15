@@ -12,7 +12,8 @@ import com.shareit.exception.ValidationException;
 import com.shareit.item.model.Item;
 import com.shareit.item.service.ItemService;
 import com.shareit.user.model.User;
-import com.shareit.user.UserService;
+import com.shareit.user.service.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,13 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.shareit.booking.mapper.BookingMapper.*;
 import static com.shareit.user.utility.UserValidator.validateUser;
-import static com.shareit.user.utility.pageRequestMaker.makePageRequest;
+import static com.shareit.utility.pageRequestMaker.makePageRequest;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 @Slf4j
 public class BookingServiceImpl implements BookingService {
 
@@ -37,14 +39,6 @@ public class BookingServiceImpl implements BookingService {
     private final UserService userService;
 
     private final ItemService itemService;
-
-    public BookingServiceImpl(BookingRepository bookingRepository,
-                              UserService userService,
-                              ItemService itemService) {
-        this.bookingRepository = bookingRepository;
-        this.userService = userService;
-        this.itemService = itemService;
-    }
 
     @Override
     public ResponseBookingDto createBooking(Long userId, RequestBookingDto requestDto) {
@@ -97,7 +91,7 @@ public class BookingServiceImpl implements BookingService {
     public List<ResponseBookingDto> getAllUserBookings (Long userId, BookingState state, int page, int size){
         User booker = userService.getUser(userId);
         Pageable pageRequest = makePageRequest(page, size, Sort.by("start").descending());
-        Page<Booking> list = switch (state) {
+        Page<Booking> currentPage = switch (state) {
             case ALL -> bookingRepository
                     .getBookingsByBooker(booker, pageRequest);
             case CURRENT -> bookingRepository
@@ -114,7 +108,7 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED -> bookingRepository
                     .getBookingsByBookerAndStatus(booker, BookingStatus.REJECTED, pageRequest);
         };
-        return list.stream()
+        return currentPage
                 .map(BookingMapper::mapBookingToResponseBookingDto)
                 .toList();
     }
@@ -124,7 +118,7 @@ public class BookingServiceImpl implements BookingService {
     public List<ResponseBookingDto> getOwnerBookings(Long userId, BookingState state, int page, int size) {
         User owner = userService.getUser(userId);
         Pageable pageRequest = makePageRequest(page, size, Sort.by("start").descending());
-        Page<Booking> list = switch (state) {
+        Page<Booking> currentPage = switch (state) {
             case ALL -> bookingRepository
                     .findBookingsByItemOwner(owner, pageRequest);
             case CURRENT -> bookingRepository
@@ -141,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED -> bookingRepository
                     .findBookingsByItemOwnerAndStatus(owner, BookingStatus.REJECTED, pageRequest);
         };
-        return list.stream()
+        return currentPage
                 .map(BookingMapper::mapBookingToResponseBookingDto)
                 .toList();
     }

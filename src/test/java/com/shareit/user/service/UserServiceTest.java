@@ -1,7 +1,5 @@
 package com.shareit.user.service;
 
-import com.shareit.user.UserService;
-import com.shareit.user.UserServiceImpl;
 import com.shareit.user.dto.RequestUserDto;
 import com.shareit.user.dto.ResponseUserDto;
 import com.shareit.user.model.User;
@@ -45,8 +43,6 @@ public class UserServiceTest {
         assertEquals(savedUser.getId(), user.getId());
         assertEquals(savedUser.getEmail(), user.getEmail());
         assertEquals(savedUser.getName(), user.getName());
-
-
     }
 
     @Test

@@ -27,9 +27,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(checkItemAvailableForBookingSQL)
     Integer checkItemAvailableForBooking(
-            @Param("item") Item item,
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate
+             Item item,
+             LocalDate startDate,
+             LocalDate endDate
     );
 
 

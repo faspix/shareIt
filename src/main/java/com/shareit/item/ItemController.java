@@ -64,7 +64,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ResponseItemDto> findItems(
+    public List<ResponseSearchItemDto> findItems(
            @RequestParam(required = false) String text,
            @RequestParam(defaultValue = "0") int page,
            @RequestParam(defaultValue = "30") int size

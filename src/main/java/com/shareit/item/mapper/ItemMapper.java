@@ -1,9 +1,6 @@
 package com.shareit.item.mapper;
 
-import com.shareit.item.dto.OwnerResponseItemDto;
-import com.shareit.item.dto.RequestItemDto;
-import com.shareit.item.dto.ResponseItemDto;
-import com.shareit.item.dto.ResponseItemDtoNoComments;
+import com.shareit.item.dto.*;
 import com.shareit.item.model.Item;
 
 public class ItemMapper {
@@ -54,6 +51,15 @@ public class ItemMapper {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
+                .build();
+    }
+
+
+    public static ResponseSearchItemDto mapItemToResponseSearchItemDto(Item item) {
+        return ResponseSearchItemDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
                 .build();
     }
 

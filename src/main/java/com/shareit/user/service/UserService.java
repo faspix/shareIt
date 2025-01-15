@@ -1,4 +1,4 @@
-package com.shareit.user;
+package com.shareit.user.service;
 
 import com.shareit.user.dto.RequestUserDto;
 import com.shareit.user.dto.ResponseUserDto;

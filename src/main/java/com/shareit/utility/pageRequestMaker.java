@@ -1,4 +1,4 @@
-package com.shareit.user.utility;
+package com.shareit.utility;
 
 import com.shareit.exception.ValidationException;
 import org.springframework.data.domain.PageRequest;

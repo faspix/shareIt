@@ -2,6 +2,7 @@ package com.shareit.user;
 
 import com.shareit.user.dto.RequestUserDto;
 import com.shareit.user.dto.ResponseUserDto;
+import com.shareit.user.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 

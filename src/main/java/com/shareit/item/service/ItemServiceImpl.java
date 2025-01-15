@@ -12,7 +12,9 @@ import com.shareit.item.model.Item;
 import com.shareit.item.repository.CommentRepository;
 import com.shareit.item.repository.ItemRepository;
 import com.shareit.user.model.User;
-import com.shareit.user.UserService;
+import com.shareit.user.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,12 +23,13 @@ import static com.shareit.booking.mapper.BookingMapper.mapBookingToResponseBooki
 import static com.shareit.item.mapper.CommentMapper.mapCommentToResponseCommentDto;
 import static com.shareit.item.mapper.ItemMapper.*;
 import static com.shareit.user.utility.UserValidator.validateUser;
-import static com.shareit.user.utility.pageRequestMaker.makePageRequest;
+import static com.shareit.utility.pageRequestMaker.makePageRequest;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
 
@@ -35,17 +38,9 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
 
     private final BookingRepository bookingRepository;
+
     private final CommentRepository commentRepository;
 
-    public ItemServiceImpl(ItemRepository itemRepository,
-                           UserService userService,
-                           BookingRepository bookingRepository,
-                           CommentRepository commentRepository) {
-        this.itemRepository = itemRepository;
-        this.userService = userService;
-        this.bookingRepository = bookingRepository;
-        this.commentRepository = commentRepository;
-    }
 
     @Override
     @Transactional
@@ -83,10 +78,9 @@ public class ItemServiceImpl implements ItemService {
 
         Pageable pageRequest = makePageRequest(page, size);
 
-        List<Item> items = itemRepository
-                .getAllByOwner(user, pageRequest)
-                .stream()
-                .toList();
+        Page<Item> items = itemRepository
+                .getAllByOwner(user, pageRequest);
+
 
         return items.stream()
                 .map(ItemMapper::mapItemToOwnerResponseItemDto)
@@ -117,12 +111,11 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public List<ResponseItemDto> findItems(String text, int page, int size) {
+    public List<ResponseSearchItemDto> findItems(String text, int page, int size) {
         Pageable requestPage = makePageRequest(page, size);
         return itemRepository
                 .searchItems(text, requestPage)
-                .stream()
-                .map(ItemMapper::mapItemToResponseItemDto)
+                .map(ItemMapper::mapItemToResponseSearchItemDto)
                 .toList();
     }
 
