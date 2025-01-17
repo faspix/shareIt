@@ -34,11 +34,11 @@ public class UserServiceTest {
     }
 
     @Test
-    void addUserTest() {
+    void createUserTest() {
         when(userRepository.save(any()))
                 .thenReturn(user);
 
-        var savedUser = userService.addUser(requestUserDto);
+        var savedUser = userService.createUser(requestUserDto);
 
         assertEquals(savedUser.getId(), user.getId());
         assertEquals(savedUser.getEmail(), user.getEmail());
@@ -46,11 +46,11 @@ public class UserServiceTest {
     }
 
     @Test
-    void getUserTest() {
+    void findUserTest() {
         when(userRepository.findById(any()))
                 .thenReturn(Optional.ofNullable(user));
 
-        var getUserResult = userService.getUser(anyLong());
+        var getUserResult = userService.findUser(anyLong());
 
         assertEquals(user.getId(), getUserResult.getId());
         assertEquals(user.getName(), getUserResult.getName());

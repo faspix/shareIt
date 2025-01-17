@@ -4,6 +4,8 @@ import com.shareit.user.dto.RequestUserDto;
 import com.shareit.user.dto.ResponseUserDto;
 import com.shareit.user.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,10 +25,11 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseUserDto addUser(
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseUserDto createUser(
             @RequestBody @Valid RequestUserDto userDto
     ) {
-        return userService.addUser(userDto);
+        return userService.createUser(userDto);
     }
 
     @PatchMapping
@@ -38,26 +41,26 @@ public class UserController {
     }
 
     @DeleteMapping
-    public void delUser(
+    public ResponseEntity<HttpStatus> deleteUser(
             @RequestHeader(name = SHARER_USER_ID) Long userId
     ) {
-        userService.deleleUser(userId);
+        return userService.deleteUser(userId);
     }
 
     @GetMapping("/{userId}")
-    public ResponseUserDto getUser(
+    public ResponseUserDto findUser(
             @PathVariable Long userId
     ) {
-        return mapUserToResponseUserDto(userService.getUser(userId));
+        return mapUserToResponseUserDto(userService.findUser(userId));
     }
 
     @GetMapping
-    public List<ResponseUserDto> getAllUsers(
+    public List<ResponseUserDto> findAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "30") int size
 
     ) {
-        return userService.getAllUsers(page, size);
+        return userService.findAllUsers(page, size);
     }
 
 }

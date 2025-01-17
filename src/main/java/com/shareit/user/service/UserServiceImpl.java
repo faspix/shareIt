@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseUserDto addUser(RequestUserDto userDto) {
+    public ResponseUserDto createUser(RequestUserDto userDto) {
         try {
             return mapUserToResponseUserDto(userRepository.saveAndFlush(mapRequestUserDtoToUser(userDto)));
         } catch (DataIntegrityViolationException e) {
@@ -38,19 +40,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleleUser(Long userId) {
-        userRepository.deleteUserById(userId); // TODO: doesn't work on users with items
+    public ResponseEntity<HttpStatus> deleteUser(Long userId) {
+        findUser(userId);
+        userRepository.deleteUserById(userId);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @Override
-    public User getUser(Long userId) {
+    public User findUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException("User with ID " + userId + " not found")
         );
     }
 
     @Override
-    public List<ResponseUserDto> getAllUsers(int page, int size) {
+    public List<ResponseUserDto> findAllUsers(int page, int size) {
         Pageable pageRequest = makePageRequest(page, size);
         Page<User> allUsers = userRepository.findAll(pageRequest);
         return allUsers
@@ -61,7 +65,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseUserDto editUser(Long userId, RequestUserDto userDto) {
-        User existUser = getUser(userId);
+        User existUser = findUser(userId);
 
         existUser.setEmail(userDto.getEmail());
         existUser.setName(userDto.getName());

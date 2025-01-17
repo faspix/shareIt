@@ -13,11 +13,15 @@ import com.shareit.item.repository.CommentRepository;
 import com.shareit.item.repository.ItemRepository;
 import com.shareit.user.model.User;
 import com.shareit.user.service.UserService;
+import io.micrometer.core.ipc.http.HttpSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import static com.shareit.booking.mapper.BookingMapper.mapBookingToResponseBookingDto;
 import static com.shareit.item.mapper.CommentMapper.mapCommentToResponseCommentDto;
@@ -25,6 +29,7 @@ import static com.shareit.item.mapper.ItemMapper.*;
 import static com.shareit.user.utility.UserValidator.validateUser;
 import static com.shareit.utility.pageRequestMaker.makePageRequest;
 
+import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -45,7 +50,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ResponseItemDtoNoComments addItem(Long userId, RequestItemDto itemDto) {
-        User user = userService.getUser(userId);
+        User user = userService.findUser(userId);
         Item item = mapRequestItemDtoToItem(itemDto);
         item.setOwner(user);
         return mapItemToResponseItemDtoNoComments(itemRepository.save(item));
@@ -74,7 +79,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<OwnerResponseItemDto> getAllUsersItems(Long userId, int page, int size) {
-        User user = userService.getUser(userId);
+        User user = userService.findUser(userId);
 
         Pageable pageRequest = makePageRequest(page, size);
 
@@ -121,16 +126,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public void deleteItem(Long userId, Long itemId) {
+    public ResponseEntity<HttpStatus> deleteItem(Long userId, Long itemId) {
         Item item = getItem(itemId);
         validateUser(userId, item.getOwner().getId());
         itemRepository.deleteById(itemId);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @Override
     @Transactional
     public ResponseCommentDto addComment(Long userId, Long itemId, RequestCommentDto commentDto) {
-        User user = userService.getUser(userId);
+        User user = userService.findUser(userId);
         Item item = getItem(itemId);
 
         Comment existingComment = commentRepository.findFirstCommentByAuthorAndItem(user, item);

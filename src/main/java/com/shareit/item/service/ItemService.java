@@ -2,6 +2,8 @@ package com.shareit.item.service;
 
 import com.shareit.item.dto.*;
 import com.shareit.item.model.Item;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -17,7 +19,7 @@ public interface ItemService {
 
     List<ResponseSearchItemDto> findItems(String text, int page, int size);
 
-    void deleteItem(Long userId, Long itemId);
+    ResponseEntity<HttpStatus> deleteItem(Long userId, Long itemId);
 
     ResponseCommentDto addComment(Long userId, Long itemId, RequestCommentDto commentDto);
 

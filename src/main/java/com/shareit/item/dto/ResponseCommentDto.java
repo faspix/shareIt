@@ -1,5 +1,6 @@
 package com.shareit.item.dto;
 
+import com.shareit.user.dto.ResponseUserDto;
 import com.shareit.user.model.User;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +11,7 @@ public class ResponseCommentDto {
 
     private Long id;
 
-    private User author;
+    private ResponseUserDto author;
 
     private String text;
 

@@ -49,7 +49,7 @@ public class BookingServiceImpl implements BookingService {
         validateNewBooking(startDate, endDate, bookedItem);
 
         Booking booking = mapRequestBookingDtoToBooking(requestDto);
-        booking.setBooker(userService.getUser(userId));
+        booking.setBooker(userService.findUser(userId));
         booking.setItem(bookedItem);
         booking.setStatus(BookingStatus.WAITING);
 
@@ -89,7 +89,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<ResponseBookingDto> getAllUserBookings (Long userId, BookingState state, int page, int size){
-        User booker = userService.getUser(userId);
+        User booker = userService.findUser(userId);
         Pageable pageRequest = makePageRequest(page, size, Sort.by("start").descending());
         Page<Booking> currentPage = switch (state) {
             case ALL -> bookingRepository
@@ -116,7 +116,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<ResponseBookingDto> getOwnerBookings(Long userId, BookingState state, int page, int size) {
-        User owner = userService.getUser(userId);
+        User owner = userService.findUser(userId);
         Pageable pageRequest = makePageRequest(page, size, Sort.by("start").descending());
         Page<Booking> currentPage = switch (state) {
             case ALL -> bookingRepository
@@ -142,9 +142,9 @@ public class BookingServiceImpl implements BookingService {
 
 
     private void validateNewBooking(LocalDate startDate, LocalDate endDate, Item bookedItem) {
-        if (startDate.isBefore(LocalDate.now()) || endDate.isBefore(LocalDate.now())) {
-            throw new ValidationException("Invalid reservation dates");
-        }
+//        if (startDate.isBefore(LocalDate.now()) || endDate.isBefore(LocalDate.now())) {
+//            throw new ValidationException("Invalid reservation dates");
+//        }
 
         if (startDate.isAfter(endDate)) {
             throw new ValidationException("Start date cannot be after end date");

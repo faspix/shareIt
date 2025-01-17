@@ -1,5 +1,7 @@
 package com.shareit.booking.dto;
 
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -19,9 +21,11 @@ public class RequestBookingDto {
     private Long itemId;
 
     @NotNull(message = "Start date shouldn't be null")
+    @FutureOrPresent(message = "Start date should be in future")
     private LocalDate start;
 
     @NotNull(message = "End date shouldn't be null")
+    @FutureOrPresent(message = "End date should be in future")
     private LocalDate end;
 
 }

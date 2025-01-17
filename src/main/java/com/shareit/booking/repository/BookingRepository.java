@@ -1,21 +1,16 @@
 package com.shareit.booking.repository;
 
-import com.shareit.booking.dto.ResponseBookingDto;
 import com.shareit.booking.model.Booking;
 import com.shareit.booking.utility.BookingStatus;
-import com.shareit.item.dto.ResponseItemDto;
 import com.shareit.item.model.Item;
 import com.shareit.user.model.User;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -31,7 +26,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
              LocalDate startDate,
              LocalDate endDate
     );
-
 
 
     Page<Booking> getBookingsByBooker(User booker, Pageable pageRequest);

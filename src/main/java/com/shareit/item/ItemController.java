@@ -3,8 +3,11 @@ package com.shareit.item;
 import com.shareit.item.dto.*;
 import com.shareit.item.service.ItemService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpResponse;
 import java.util.List;
 
 import static com.shareit.item.mapper.ItemMapper.mapItemToResponseItemDto;
@@ -56,11 +59,12 @@ public class ItemController {
     }
 
     @DeleteMapping("/{itemId}")
-    public void deleteItem( // ResponseEntity<HttpStatus>
-            @RequestHeader(name = SHARER_USER_ID) Long userId,
-            @PathVariable Long itemId
+    public ResponseEntity<HttpStatus> deleteItem(
+                                                  @RequestHeader(name = SHARER_USER_ID) Long userId,
+                                                  @PathVariable Long itemId
     ) {
-        itemService.deleteItem(userId, itemId); // ResponseEntity.ok(HttpStatus.OK)
+        return itemService.deleteItem(userId, itemId);
+
     }
 
     @GetMapping("/search")

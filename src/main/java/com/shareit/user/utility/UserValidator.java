@@ -1,9 +1,6 @@
 package com.shareit.user.utility;
 
 import com.shareit.exception.ValidationException;
-import com.shareit.user.model.User;
-import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
 
 public class UserValidator {
 
