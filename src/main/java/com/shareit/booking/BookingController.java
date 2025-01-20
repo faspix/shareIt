@@ -2,17 +2,22 @@ package com.shareit.booking;
 
 import com.shareit.booking.dto.ResponseBookingDto;
 import com.shareit.booking.dto.RequestBookingDto;
+import com.shareit.booking.mapper.BookingMapper;
 import com.shareit.booking.service.BookingService;
 import com.shareit.booking.utility.BookingState;
+import com.shareit.security.SecurityUser;
+import com.shareit.user.mapper.UserMapper;
+import com.shareit.user.repository.UserRepository;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.shareit.booking.mapper.BookingMapper.mapBookingToResponseBookingDto;
-
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
 public class BookingController {
 
@@ -20,53 +25,56 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    public BookingController(BookingService bookingService) {
-        this.bookingService = bookingService;
-    }
+    private final BookingMapper bookingMapper;
 
     @PostMapping
     public ResponseBookingDto createBookingBooking(
-            @RequestHeader(name = SHARER_USER_ID) Long userId,
+//            @RequestHeader(name = SHARER_USER_ID) Long userId,
+            @AuthenticationPrincipal SecurityUser userPrincipal,
             @RequestBody @Valid RequestBookingDto bookingDto
     ) {
-        return bookingService.createBooking(userId, bookingDto);
+        return bookingService.createBooking(userPrincipal.getUser(), bookingDto);
     }
 
     @PatchMapping("/{bookingId}")
     public ResponseBookingDto approveBooking(
-            @RequestHeader(name = SHARER_USER_ID) Long userId,
+//            @RequestHeader(name = SHARER_USER_ID) Long userId,
+            @AuthenticationPrincipal SecurityUser userPrincipal,
             @PathVariable Long bookingId,
             @RequestParam(name = "approved") Boolean approvedStatus
     ) {
-        return bookingService.approveBooking(userId, bookingId, approvedStatus);
+        return bookingService.approveBooking(userPrincipal.getUser(), bookingId, approvedStatus);
     }
 
     @GetMapping("/{bookingId}")
     public ResponseBookingDto getBooking(
-            @RequestHeader(name = SHARER_USER_ID) Long userId,
+//            @RequestHeader(name = SHARER_USER_ID) Long userId,
+            @AuthenticationPrincipal SecurityUser userPrincipal,
             @PathVariable Long bookingId
     ) {
-        return mapBookingToResponseBookingDto(bookingService.getBooking(userId, bookingId));
+        return bookingMapper.mapBookingToResponseBookingDto(bookingService.getBooking(userPrincipal.getUser(), bookingId));
     }
 
     @GetMapping
     public List<ResponseBookingDto> getAllUserBookings(
-            @RequestHeader(name = SHARER_USER_ID) Long userId,
+//            @RequestHeader(name = SHARER_USER_ID) Long userId,
+            @AuthenticationPrincipal SecurityUser userPrincipal,
             @RequestParam(defaultValue = "ALL") BookingState state,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "30") int size
     ) {
-        return bookingService.getAllUserBookings(userId, state, page, size);
+        return bookingService.getAllUserBookings(userPrincipal.getUser(), state, page, size);
     }
 
     @GetMapping("/owner")
     public List<ResponseBookingDto> getOwnerBookings(
-            @RequestHeader(name = SHARER_USER_ID) Long userId,
+//            @RequestHeader(name = SHARER_USER_ID) Long userId,
+            @AuthenticationPrincipal SecurityUser userPrincipal,
             @RequestParam(defaultValue = "ALL") BookingState state,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "30") int size
     ) {
-        return bookingService.getOwnerBookings(userId, state, page, size);
+        return bookingService.getOwnerBookings(userPrincipal.getUser(), state, page, size);
     }
 
 

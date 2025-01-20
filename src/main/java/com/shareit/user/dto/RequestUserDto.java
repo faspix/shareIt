@@ -24,5 +24,7 @@ public class RequestUserDto {
     @Size(max = 255, message = "Email cannot be greater then 255 characters")
     private String email;
 
+    @NotBlank(message = "Password shouldn't be blank")//, groups = CreateAction.class)
+    private String password;
 }
 

@@ -40,56 +40,58 @@ public class BookingServiceImpl implements BookingService {
 
     private final ItemService itemService;
 
+    private final BookingMapper bookingMapper;
+
     @Override
-    public ResponseBookingDto createBooking(Long userId, RequestBookingDto requestDto) {
+    public ResponseBookingDto createBooking(User user, RequestBookingDto requestDto) {
         LocalDate startDate = requestDto.getStart();
         LocalDate endDate = requestDto.getEnd();
         Item bookedItem = itemService.getItem(requestDto.getItemId());
 
         validateNewBooking(startDate, endDate, bookedItem);
 
-        Booking booking = mapRequestBookingDtoToBooking(requestDto);
-        booking.setBooker(userService.findUser(userId));
+        Booking booking = bookingMapper.mapRequestBookingDtoToBooking(requestDto);
+        booking.setBooker(user);
         booking.setItem(bookedItem);
         booking.setStatus(BookingStatus.WAITING);
 
         bookingRepository.save(booking);
-        return mapBookingToResponseBookingDto(booking);
+        return bookingMapper.mapBookingToResponseBookingDto(booking);
     }
 
 
 
     @Override
-    public ResponseBookingDto approveBooking(Long userId, Long bookingId, Boolean approvedStatus) {
-        Booking booking = getBooking(userId, bookingId);
+    public ResponseBookingDto approveBooking(User user, Long bookingId, Boolean approvedStatus) {
+        Booking booking = getBooking(user, bookingId);
 
         if (! booking.getStatus().equals(BookingStatus.WAITING)) {
             throw new ValidationException("Booking status is not WAITING. This bookings cannot be updated");
         }
 
         User owner = booking.getItem().getOwner();
-        validateUser(userId, owner.getId());
+        validateUser(user.getId(), owner.getId());
         booking.setStatus(approvedStatus ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        return mapBookingToResponseBookingDto(bookingRepository.save(booking));
+        return bookingMapper.mapBookingToResponseBookingDto(bookingRepository.save(booking));
     }
 
     @Override
-    public Booking getBooking(Long userId, Long bookingId) {
+    public Booking getBooking(User user, Long bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(
                 () -> new NotFoundException("Booking with ID " + bookingId + " not found")
         );
 
-        if (!booking.getBooker().getId().equals(userId)
-                && !booking.getItem().getOwner().getId().equals(userId)) {
-            throw new ValidationException("User with ID " + userId + " doesn't own or booked this item");
+        if (!booking.getBooker().equals(user)
+                && !booking.getItem().getOwner().equals(user)) {
+            throw new ValidationException("User with ID " + user.getId() + " doesn't own or booked this item");
         }
         return booking;
     }
 
     @Override
-    public List<ResponseBookingDto> getAllUserBookings (Long userId, BookingState state, int page, int size){
-        User booker = userService.findUser(userId);
+    public List<ResponseBookingDto> getAllUserBookings (User booker, BookingState state, int page, int size){
+//        User booker = userService.findUser(userId);
         Pageable pageRequest = makePageRequest(page, size, Sort.by("start").descending());
         Page<Booking> currentPage = switch (state) {
             case ALL -> bookingRepository
@@ -109,14 +111,14 @@ public class BookingServiceImpl implements BookingService {
                     .getBookingsByBookerAndStatus(booker, BookingStatus.REJECTED, pageRequest);
         };
         return currentPage
-                .map(BookingMapper::mapBookingToResponseBookingDto)
+                .map(bookingMapper::mapBookingToResponseBookingDto)
                 .toList();
     }
 
 
     @Override
-    public List<ResponseBookingDto> getOwnerBookings(Long userId, BookingState state, int page, int size) {
-        User owner = userService.findUser(userId);
+    public List<ResponseBookingDto> getOwnerBookings(User owner, BookingState state, int page, int size) {
+//        User owner = userService.findUser(userId);
         Pageable pageRequest = makePageRequest(page, size, Sort.by("start").descending());
         Page<Booking> currentPage = switch (state) {
             case ALL -> bookingRepository
@@ -136,7 +138,7 @@ public class BookingServiceImpl implements BookingService {
                     .findBookingsByItemOwnerAndStatus(owner, BookingStatus.REJECTED, pageRequest);
         };
         return currentPage
-                .map(BookingMapper::mapBookingToResponseBookingDto)
+                .map(bookingMapper::mapBookingToResponseBookingDto)
                 .toList();
     }
 

@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.shareit.user.mapper.UserMapper.*;
 import static com.shareit.utility.pageRequestMaker.makePageRequest;
 
 import java.util.List;
@@ -28,21 +27,27 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final UserMapper userMapper;
+
     @Override
     @Transactional
     public ResponseUserDto createUser(RequestUserDto userDto) {
         try {
-            return mapUserToResponseUserDto(userRepository.saveAndFlush(mapRequestUserDtoToUser(userDto)));
+            return userMapper.mapUserToResponseUserDto(
+                    userRepository.saveAndFlush(
+                            userMapper.mapRequestUserDtoToUser(userDto)
+                    )
+            );
         } catch (DataIntegrityViolationException e) {
+            System.out.println(e);
             throw new UserAlreadyExistException("User with email " + userDto.getEmail() + " already exist");
         }
     }
 
     @Override
     @Transactional
-    public ResponseEntity<HttpStatus> deleteUser(Long userId) {
-        findUser(userId);
-        userRepository.deleteUserById(userId);
+    public ResponseEntity<HttpStatus> deleteUser(User user) {
+        userRepository.delete(user);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -58,21 +63,21 @@ public class UserServiceImpl implements UserService {
         Pageable pageRequest = makePageRequest(page, size);
         Page<User> allUsers = userRepository.findAll(pageRequest);
         return allUsers
-                .map(UserMapper::mapUserToResponseUserDto)
+                .map(userMapper::mapUserToResponseUserDto)
                 .toList();
     }
 
     @Override
     @Transactional
-    public ResponseUserDto editUser(Long userId, RequestUserDto userDto) {
-        User existUser = findUser(userId);
+    public ResponseUserDto editUser(User existUser, RequestUserDto userDto) {
+//        User existUser = findUser(userId);
 
         existUser.setEmail(userDto.getEmail());
         existUser.setName(userDto.getName());
 
         try {
             userRepository.saveAndFlush(existUser);
-            return mapUserToResponseUserDto(existUser);
+            return userMapper.mapUserToResponseUserDto(existUser);
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyExistException("User with email " + userDto.getEmail() + " already exist");
         }

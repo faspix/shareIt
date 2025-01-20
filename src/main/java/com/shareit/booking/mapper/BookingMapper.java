@@ -3,16 +3,22 @@ package com.shareit.booking.mapper;
 import com.shareit.booking.dto.ResponseBookingDto;
 import com.shareit.booking.dto.RequestBookingDto;
 import com.shareit.booking.model.Booking;
+import com.shareit.user.mapper.UserMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import static com.shareit.item.mapper.ItemMapper.*;
-import static com.shareit.user.mapper.UserMapper.mapUserToResponseUserDto;
 
+@Component
+@RequiredArgsConstructor
 public class BookingMapper {
 
-    public static ResponseBookingDto mapBookingToResponseBookingDto(Booking booking) {
+    private final UserMapper userMapper;
+
+    public ResponseBookingDto mapBookingToResponseBookingDto(Booking booking) {
         if (booking == null) return null;
         return ResponseBookingDto.builder()
-                .booker(mapUserToResponseUserDto(booking.getBooker()))
+                .booker(userMapper.mapUserToResponseUserDto(booking.getBooker()))
                 .item(mapItemToResponseItemDtoNoComments(booking.getItem()))
                 .status(booking.getStatus())
                 .id(booking.getId())
@@ -21,7 +27,7 @@ public class BookingMapper {
                 .build();
     }
 
-    public static Booking mapRequestBookingDtoToBooking(RequestBookingDto bookingDto) {
+    public Booking mapRequestBookingDtoToBooking(RequestBookingDto bookingDto) {
        return Booking.builder()
                .start(bookingDto.getStart())
                .end(bookingDto.getEnd())

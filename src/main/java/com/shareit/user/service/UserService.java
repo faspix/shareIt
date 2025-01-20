@@ -12,9 +12,9 @@ import java.util.List;
 public interface UserService {
 
     ResponseUserDto createUser(RequestUserDto userDto);
-    ResponseEntity<HttpStatus> deleteUser(Long userId);
+    ResponseEntity<HttpStatus> deleteUser(User user);
     User findUser(Long userId);
     List<ResponseUserDto> findAllUsers(int page, int size);
-    ResponseUserDto editUser(Long userId, RequestUserDto userDto);
+    ResponseUserDto editUser(User user, RequestUserDto userDto);
 
 }

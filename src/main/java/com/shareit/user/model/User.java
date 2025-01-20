@@ -1,10 +1,10 @@
 package com.shareit.user.model;
 
 import com.shareit.common.model.AuditingModel;
+import com.shareit.user.utility.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.RelationTargetAuditMode;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
@@ -28,6 +28,12 @@ public class User extends AuditingModel {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    private String password;
+
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
 
 //    @OneToMany(mappedBy = "id")
 //    private List<Item> items;

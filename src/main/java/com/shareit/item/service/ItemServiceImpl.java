@@ -1,11 +1,13 @@
 package com.shareit.item.service;
 
+import com.shareit.booking.mapper.BookingMapper;
 import com.shareit.booking.model.Booking;
 import com.shareit.booking.repository.BookingRepository;
 import com.shareit.booking.utility.BookingStatus;
 import com.shareit.exception.NotFoundException;
 import com.shareit.exception.ValidationException;
 import com.shareit.item.dto.*;
+import com.shareit.item.mapper.CommentMapper;
 import com.shareit.item.mapper.ItemMapper;
 import com.shareit.item.model.Comment;
 import com.shareit.item.model.Item;
@@ -23,8 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import static com.shareit.booking.mapper.BookingMapper.mapBookingToResponseBookingDto;
-import static com.shareit.item.mapper.CommentMapper.mapCommentToResponseCommentDto;
 import static com.shareit.item.mapper.ItemMapper.*;
 import static com.shareit.user.utility.UserValidator.validateUser;
 import static com.shareit.utility.pageRequestMaker.makePageRequest;
@@ -46,27 +46,31 @@ public class ItemServiceImpl implements ItemService {
 
     private final CommentRepository commentRepository;
 
+    private final ItemMapper itemMapper;
+
+    private final BookingMapper bookingMapper;
+
+    private final CommentMapper commentMapper;
 
     @Override
     @Transactional
-    public ResponseItemDtoNoComments addItem(Long userId, RequestItemDto itemDto) {
-        User user = userService.findUser(userId);
-        Item item = mapRequestItemDtoToItem(itemDto);
+    public ResponseItemDtoNoComments addItem(User user, RequestItemDto itemDto) {
+        Item item = itemMapper.mapRequestItemDtoToItem(itemDto);
         item.setOwner(user);
         return mapItemToResponseItemDtoNoComments(itemRepository.save(item));
     }
 
     @Override
     @Transactional
-    public ResponseItemDto editItem(Long userId, Long itemId, RequestItemDto itemDto) {
+    public ResponseItemDto editItem(User user, Long itemId, RequestItemDto itemDto) {
         Item item = getItem(itemId);
-        validateUser(userId, item.getOwner().getId());
+        validateUser(user.getId(), item.getOwner().getId());
 
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
 
-        return mapItemToResponseItemDto(itemRepository.save(item));
+        return itemMapper.mapItemToResponseItemDto(itemRepository.save(item));
     }
 
     @Override
@@ -78,9 +82,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public List<OwnerResponseItemDto> getAllUsersItems(Long userId, int page, int size) {
-        User user = userService.findUser(userId);
-
+    public List<OwnerResponseItemDto> getAllUsersItems(User user, int page, int size) {
         Pageable pageRequest = makePageRequest(page, size);
 
         Page<Item> items = itemRepository
@@ -88,10 +90,10 @@ public class ItemServiceImpl implements ItemService {
 
 
         return items.stream()
-                .map(ItemMapper::mapItemToOwnerResponseItemDto)
+                .map(itemMapper::mapItemToOwnerResponseItemDto)
                 .peek(item -> {
                     item.setNextBooking(
-                            mapBookingToResponseBookingDto(
+                            bookingMapper.mapBookingToResponseBookingDto(
                                     bookingRepository
                                             .findFirstBookingByItemAndStatusAndStartAfterOrderByStart
                                                     (mapOwnerResponseItemDtoToItem(item),
@@ -101,7 +103,7 @@ public class ItemServiceImpl implements ItemService {
                             )
                     );
                     item.setLastBooking(
-                            mapBookingToResponseBookingDto(
+                            bookingMapper.mapBookingToResponseBookingDto(
                                     bookingRepository
                                             .findFirstBookingByItemAndStatusAndEndBeforeOrderByEndDesc
                                                     (mapOwnerResponseItemDtoToItem(item),
@@ -126,28 +128,27 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ResponseEntity<HttpStatus> deleteItem(Long userId, Long itemId) {
+    public ResponseEntity<HttpStatus> deleteItem(User user, Long itemId) {
         Item item = getItem(itemId);
-        validateUser(userId, item.getOwner().getId());
+        validateUser(user.getId(), item.getOwner().getId());
         itemRepository.deleteById(itemId);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @Override
     @Transactional
-    public ResponseCommentDto addComment(Long userId, Long itemId, RequestCommentDto commentDto) {
-        User user = userService.findUser(userId);
+    public ResponseCommentDto addComment(User user, Long itemId, RequestCommentDto commentDto) {
         Item item = getItem(itemId);
 
         Comment existingComment = commentRepository.findFirstCommentByAuthorAndItem(user, item);
         if (existingComment != null) {
-            throw new ValidationException("User ID " + userId + " already commented this item");
+            throw new ValidationException("User ID " + user.getId() + " already commented this item");
         }
 
         Booking booking = bookingRepository
                 .findFirstBookingByBookerAndStatusAndEndBefore(user, BookingStatus.APPROVED, LocalDate.now());
         if (booking == null) {
-            throw new ValidationException("User ID " + userId + " didn't book this item");
+            throw new ValidationException("User ID " + user.getId() + " didn't book this item");
         }
 
         Comment comment = new Comment();
@@ -156,7 +157,7 @@ public class ItemServiceImpl implements ItemService {
         comment.setText(commentDto.getText());
 
         commentRepository.save(comment);
-        return mapCommentToResponseCommentDto(comment);
+        return commentMapper.mapCommentToResponseCommentDto(comment);
     }
 
 

@@ -2,11 +2,16 @@ package com.shareit.item.mapper;
 
 import com.shareit.item.dto.*;
 import com.shareit.item.model.Item;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
 public class ItemMapper {
 
+    private final CommentMapper commentMapper;
 
-    public static Item mapRequestItemDtoToItem(RequestItemDto itemDto) {
+    public Item mapRequestItemDtoToItem(RequestItemDto itemDto) {
         return Item.builder()
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
@@ -14,7 +19,7 @@ public class ItemMapper {
                 .build();
     }
 
-    public static ResponseItemDto mapItemToResponseItemDto(Item item) {
+    public ResponseItemDto mapItemToResponseItemDto(Item item) {
         return ResponseItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
@@ -22,12 +27,12 @@ public class ItemMapper {
                 .available(item.getAvailable())
                 .comments((item.getComments()
                         .stream()
-                        .map(CommentMapper::mapCommentToResponseCommentDto)
+                        .map(commentMapper::mapCommentToResponseCommentDto)
                         .toList()))
                 .build();
     }
 
-    public static OwnerResponseItemDto mapItemToOwnerResponseItemDto(Item item) {
+    public OwnerResponseItemDto mapItemToOwnerResponseItemDto(Item item) {
         return OwnerResponseItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())

@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users_aud (
     rev BIGINT REFERENCES revision (id),
     revtype SMALLINT,
     email VARCHAR(255),
-    name VARCHAR(255)
+    name VARCHAR(255),
+    role VARCHAR(20) DEFAULT 'USER'
 
 );
