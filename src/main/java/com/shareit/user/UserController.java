@@ -19,8 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private static final String SHARER_USER_ID = "X-Sharer-User-Id";
-
     private final UserService userService;
 
     private final UserMapper userMapper;
@@ -35,7 +33,6 @@ public class UserController {
 
     @PatchMapping
     public ResponseUserDto editUser(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @RequestBody @Valid RequestUserDto userDto,
             @AuthenticationPrincipal SecurityUser userPrincipal
             ) {
@@ -44,7 +41,6 @@ public class UserController {
 
     @DeleteMapping
     public ResponseEntity<HttpStatus> deleteUser(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId
             @AuthenticationPrincipal SecurityUser userPrincipal
     ) {
         return userService.deleteUser(userPrincipal.getUser());

@@ -21,7 +21,6 @@ import java.util.List;
 @RequestMapping(path = "/bookings")
 public class BookingController {
 
-    private static final String SHARER_USER_ID = "X-Sharer-User-Id";
 
     private final BookingService bookingService;
 
@@ -29,7 +28,6 @@ public class BookingController {
 
     @PostMapping
     public ResponseBookingDto createBookingBooking(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @AuthenticationPrincipal SecurityUser userPrincipal,
             @RequestBody @Valid RequestBookingDto bookingDto
     ) {
@@ -38,7 +36,6 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")
     public ResponseBookingDto approveBooking(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @AuthenticationPrincipal SecurityUser userPrincipal,
             @PathVariable Long bookingId,
             @RequestParam(name = "approved") Boolean approvedStatus
@@ -48,7 +45,6 @@ public class BookingController {
 
     @GetMapping("/{bookingId}")
     public ResponseBookingDto getBooking(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @AuthenticationPrincipal SecurityUser userPrincipal,
             @PathVariable Long bookingId
     ) {
@@ -57,7 +53,6 @@ public class BookingController {
 
     @GetMapping
     public List<ResponseBookingDto> getAllUserBookings(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @AuthenticationPrincipal SecurityUser userPrincipal,
             @RequestParam(defaultValue = "ALL") BookingState state,
             @RequestParam(defaultValue = "0") int page,
@@ -68,7 +63,6 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<ResponseBookingDto> getOwnerBookings(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @AuthenticationPrincipal SecurityUser userPrincipal,
             @RequestParam(defaultValue = "ALL") BookingState state,
             @RequestParam(defaultValue = "0") int page,
@@ -76,6 +70,5 @@ public class BookingController {
     ) {
         return bookingService.getOwnerBookings(userPrincipal.getUser(), state, page, size);
     }
-
 
 }

@@ -19,15 +19,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemController {
 
-    private static final String SHARER_USER_ID = "X-Sharer-User-Id";
-
     private final ItemService itemService;
 
     private final ItemMapper itemMapper;
 
     @PostMapping
     public ResponseItemDtoNoComments addItem(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @AuthenticationPrincipal SecurityUser userPrincipal,
             @RequestBody @Valid RequestItemDto itemDto
     ) {
@@ -36,7 +33,6 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ResponseItemDto editItem(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @AuthenticationPrincipal SecurityUser userPrincipal,
             @PathVariable Long itemId,
             @RequestBody @Valid RequestItemDto itemDto
@@ -53,7 +49,6 @@ public class ItemController {
 
     @GetMapping
     public List<OwnerResponseItemDto> getAllUsersItems(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @AuthenticationPrincipal SecurityUser userPrincipal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "30") int size
@@ -63,7 +58,6 @@ public class ItemController {
 
     @DeleteMapping("/{itemId}")
     public ResponseEntity<HttpStatus> deleteItem(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @AuthenticationPrincipal SecurityUser userPrincipal,
             @PathVariable Long itemId
     ) {
@@ -82,7 +76,6 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public ResponseCommentDto addComment(
-//            @RequestHeader(name = SHARER_USER_ID) Long userId,
             @AuthenticationPrincipal SecurityUser userPrincipal,
             @PathVariable Long itemId,
             @RequestBody @Valid RequestCommentDto commentDto
