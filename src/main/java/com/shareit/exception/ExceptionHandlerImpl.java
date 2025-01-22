@@ -1,6 +1,7 @@
 package com.shareit.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +27,12 @@ public class ExceptionHandlerImpl {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     private ExceptionResponse handleGeneralException(final Exception e) {
+        return new ExceptionResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    private ExceptionResponse handleAuthenticationException(final AuthenticationException e) {
         return new ExceptionResponse(e.getMessage());
     }
 

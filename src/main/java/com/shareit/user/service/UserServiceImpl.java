@@ -70,14 +70,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseUserDto editUser(User existUser, RequestUserDto userDto) {
-//        User existUser = findUser(userId);
-
-        existUser.setEmail(userDto.getEmail());
-        existUser.setName(userDto.getName());
-
+        User updatedUser = userMapper.mapRequestUserDtoToUser(userDto);
+        updatedUser.setId(existUser.getId());
         try {
-            userRepository.saveAndFlush(existUser);
-            return userMapper.mapUserToResponseUserDto(existUser);
+            userRepository.saveAndFlush(updatedUser);
+            return userMapper.mapUserToResponseUserDto(updatedUser);
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyExistException("User with email " + userDto.getEmail() + " already exist");
         }
