@@ -35,8 +35,7 @@ public class UserServiceImpl implements UserService {
         try {
             return userMapper.mapUserToResponseUserDto(
                     userRepository.saveAndFlush(
-                            userMapper.mapRequestUserDtoToUser(userDto)
-                    )
+                            userMapper.mapRequestUserDtoToUser(userDto))
             );
         } catch (DataIntegrityViolationException e) {
             System.out.println(e);
