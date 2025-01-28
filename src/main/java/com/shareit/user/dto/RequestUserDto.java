@@ -2,7 +2,6 @@ package com.shareit.user.dto;
 
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -24,7 +23,7 @@ public class RequestUserDto {
     @Size(max = 255, message = "Email cannot be greater then 255 characters")
     private String email;
 
-    @NotBlank(message = "Password shouldn't be blank")//, groups = CreateAction.class)
+    @NotBlank(message = "Password shouldn't be blank")
     private String password;
 }
 

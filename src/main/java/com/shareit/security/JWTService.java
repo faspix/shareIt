@@ -14,11 +14,14 @@ import java.util.Date;
 @Component
 public class JWTService {
 
-//    @Value("${security.jwt.secret}")
-    private final static String SECRET = "dHUSdowidvvbbxnzmcdGTESYIFJdsvinbydFESUHaos";
+    @Value("${security.jwt.secret:secretkey}")
+    private String secret;
+
+    @Value("${security.jwe.validity:60}")
+    private int validityInMin;
 
     public String generateToken(String username) {
-        Date expirationDate = Date.from(ZonedDateTime.now().plusMinutes(60).toInstant());
+        Date expirationDate = Date.from(ZonedDateTime.now().plusMinutes(validityInMin).toInstant());
 
         return JWT.create()
                 .withSubject("User details")
@@ -26,11 +29,11 @@ public class JWTService {
                 .withClaim("username", username)
                 .withIssuedAt(new Date())
                 .withExpiresAt(expirationDate)
-                .sign(Algorithm.HMAC256(SECRET));
+                .sign(Algorithm.HMAC256(secret));
     }
 
     public String validateToken(String token) throws JWTVerificationException {
-        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SECRET))
+        JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret))
                 .withSubject("User details")
                 .withIssuer("ShareIt")
                 .build();

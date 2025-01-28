@@ -38,5 +38,12 @@ public class User extends AuditingModel {
 //    @OneToMany(mappedBy = "id")
 //    private List<Item> items;
 
+    @PrePersist
+    public void setDefaultValues() {
+        if (userRole == null) {
+            userRole = UserRole.valueOf("USER");
+        }
+    }
+
 }
 

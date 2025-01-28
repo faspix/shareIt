@@ -18,7 +18,7 @@ public class SecurityUser extends DefaultOidcUser implements UserDetails, OAuth2
 
     private final com.shareit.user.model.User user;
 
-    private String password;
+    private final String password;
 
     private final String username;
 

@@ -27,24 +27,26 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .authorizeHttpRequests((authz) -> authz
+                .csrf(
+                        csrf -> csrf
+                                .disable()
+//                                .ignoringRequestMatchers("/users")
+//                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
+                .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api", "/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/items/*").permitAll()
-//                        .requestMatchers("/admin/**").hasAuthority(UserRole.ADMIN.getAuthority())
                         .anyRequest().authenticated()
-        )
+                )
                 .httpBasic(withDefaults())
                 .oauth2Login(config -> config
                         .userInfoEndpoint(userInfo -> userInfo.oidcUserService(oidcUserService()))
-                        .defaultSuccessUrl("/items/search?text=")
                 );
 
 
         return http.build();
     }
-
 
     private OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
         return userRequest -> {
@@ -55,7 +57,6 @@ public class SecurityConfiguration {
 
         };
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
