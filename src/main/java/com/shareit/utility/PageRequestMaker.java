@@ -5,7 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-public class pageRequestMaker {
+public class PageRequestMaker {
 
     public static Pageable makePageRequest(int page, int size, Sort sort) {
         if (size > 30) {

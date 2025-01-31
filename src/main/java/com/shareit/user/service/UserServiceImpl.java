@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.shareit.utility.pageRequestMaker.makePageRequest;
+import static com.shareit.utility.PageRequestMaker.makePageRequest;
 
 import java.util.List;
 

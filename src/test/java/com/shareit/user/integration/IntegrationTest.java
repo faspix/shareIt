@@ -1,52 +1,41 @@
-package com.shareit.user.controller;
+package com.shareit.user.integration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shareit.user.UserController;
+import com.shareit.ShareitApplication;
 import com.shareit.user.dto.RequestUserDto;
 import com.shareit.user.dto.ResponseUserDto;
-import com.shareit.user.mapper.UserMapper;
-import com.shareit.user.model.User;
-import com.shareit.user.repository.UserRepository;
-import com.shareit.user.service.UserService;
-import com.shareit.user.utility.UserRole;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = UserController.class)
+@SpringBootTest(classes = ShareitApplication.class)
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
 @WithMockUser(username = "test@gmail.com", password = "test", authorities = {"ADMIN", "USER"})
-public class UserControllerTest {
+public class IntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper mapper;
-
-    @MockitoBean
-    private UserService userService;
-
-    @MockitoBean
-    private UserRepository userRepository;
-
-    @MockitoBean
-    private UserMapper userMapper;
 
     static final long TEST_USER_ID = 1L;
 
@@ -62,16 +51,6 @@ public class UserControllerTest {
             .email(testRequestUser.getEmail())
             .build();
 
-
-    private final User testUser = User.builder()
-            .id(1L)
-            .name("testUser")
-            .email("test@gmail.com")
-            .password("testPassword")
-            .userRole(UserRole.USER)
-            .build();
-
-
     @Test
     void findAllUsersTest() throws Exception {
         mockMvc.perform(get("/users"))
@@ -80,22 +59,21 @@ public class UserControllerTest {
 
     @Test
     void createUserTest() throws Exception {
-        when(userService.createUser(any(RequestUserDto.class)))
-                .thenReturn(testResponseUser);
-
-        mockMvc.perform(post("/users")
+        MvcResult mvcResult = mockMvc.perform(post("/users")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(testRequestUser))
 
-        ).andExpectAll(
-                status().is2xxSuccessful(),
-                jsonPath("$.id", is(testResponseUser.getId()), Long.class),
-                jsonPath("$.name", is(testResponseUser.getName())),
-                jsonPath("$.email", is(testResponseUser.getEmail()))
-        );
+                )
+                .andExpect(status().is(201))
+                .andReturn();
+        String body = mvcResult.getResponse().getContentAsString();
+        System.out.println(body);
+        ResponseUserDto user = mapper.readValue(body, ResponseUserDto.class);
+        Assertions.assertEquals(user.getName(), testRequestUser.getName());
+
     }
 
 }

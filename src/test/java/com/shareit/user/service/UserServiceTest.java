@@ -6,6 +6,8 @@ import com.shareit.user.mapper.UserMapper;
 import com.shareit.user.model.User;
 import com.shareit.user.repository.UserRepository;
 import com.shareit.user.utility.UserRole;
+import com.shareit.utility.PageRequestMaker;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +15,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.List;
 import java.util.Optional;
 
+import static com.shareit.utility.PageRequestMaker.makePageRequest;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -25,9 +29,7 @@ public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    private UserService userService;
-
-    User testUser = User.builder()
+    private final User testUser = User.builder()
             .id(1L)
             .name("testUser")
             .email("test@gmail.com")
@@ -35,20 +37,23 @@ public class UserServiceTest {
             .userRole(UserRole.USER)
             .build();
 
-    RequestUserDto testRequestUser = RequestUserDto.builder()
+    private final RequestUserDto testRequestUser = RequestUserDto.builder()
             .name(testUser.getName())
             .email(testUser.getEmail())
             .password(testUser.getPassword())
             .build();
 
-    ResponseUserDto testResponseUser = ResponseUserDto.builder()
+    private final ResponseUserDto testResponseUser = ResponseUserDto.builder()
             .id(testUser.getId())
             .name(testUser.getName())
             .email(testUser.getEmail())
             .build();
 
+    private UserService userService;
+
+
     @BeforeEach
-    void init() {
+    public void init() {
         userService = new UserServiceImpl(userRepository, new UserMapper(new BCryptPasswordEncoder()));
     }
 
@@ -74,6 +79,21 @@ public class UserServiceTest {
         assertEquals(testUser.getId(), getUserResult.getId());
         assertEquals(testUser.getName(), getUserResult.getName());
         assertEquals(testUser.getEmail(), getUserResult.getEmail());
+
+    }
+
+    @Test
+    void editUserTest() {
+        when(userRepository.saveAndFlush(any()))
+                .thenReturn(testUser);
+        RequestUserDto updatedUser = new RequestUserDto("Updated name",
+                testUser.getEmail(),
+                testUser.getPassword());
+
+        var user = userService.editUser(testUser, updatedUser);
+
+        assertEquals(user.getName(), updatedUser.getName());
+        assertEquals(user.getEmail(), updatedUser.getEmail());
 
     }
 
