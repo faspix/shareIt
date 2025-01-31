@@ -21,9 +21,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.shareit.booking.mapper.BookingMapper.*;
 import static com.shareit.user.utility.UserValidator.validateUser;
-import static com.shareit.utility.pageRequestMaker.makePageRequest;
+import static com.shareit.utility.PageRequestMaker.makePageRequest;
 
 import java.time.LocalDate;
 import java.util.List;
