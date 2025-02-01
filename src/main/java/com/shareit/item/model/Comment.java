@@ -2,6 +2,8 @@ package com.shareit.item.model;
 
 import com.shareit.user.model.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "Comments")
 @Data
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class Comment {
 
     @Id
