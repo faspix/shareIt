@@ -1,13 +1,8 @@
 package com.shareit.user.service;
 
 import com.shareit.user.dto.RequestUserDto;
-import com.shareit.user.dto.ResponseUserDto;
 import com.shareit.user.mapper.UserMapper;
-import com.shareit.user.model.User;
 import com.shareit.user.repository.UserRepository;
-import com.shareit.user.utility.UserRole;
-import com.shareit.utility.PageRequestMaker;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,10 +10,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.List;
 import java.util.Optional;
 
-import static com.shareit.utility.PageRequestMaker.makePageRequest;
+import static com.shareit.user.utils.UserUtils.REQUEST_USER_DTO_TEST;
+import static com.shareit.user.utils.UserUtils.USER_TEST;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -28,26 +23,6 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
-    private final User testUser = User.builder()
-            .id(1L)
-            .name("testUser")
-            .email("test@gmail.com")
-            .password("testPassword")
-            .userRole(UserRole.USER)
-            .build();
-
-    private final RequestUserDto testRequestUser = RequestUserDto.builder()
-            .name(testUser.getName())
-            .email(testUser.getEmail())
-            .password(testUser.getPassword())
-            .build();
-
-    private final ResponseUserDto testResponseUser = ResponseUserDto.builder()
-            .id(testUser.getId())
-            .name(testUser.getName())
-            .email(testUser.getEmail())
-            .build();
 
     private UserService userService;
 
@@ -60,37 +35,37 @@ public class UserServiceTest {
     @Test
     void createUserTest() {
         when(userRepository.saveAndFlush(any()))
-                .thenReturn(testUser);
+                .thenReturn(USER_TEST);
 
-        var savedUser = userService.createUser(testRequestUser);
+        var savedUser = userService.createUser(REQUEST_USER_DTO_TEST);
 
-        assertEquals(savedUser.getId(), testUser.getId());
-        assertEquals(savedUser.getEmail(), testUser.getEmail());
-        assertEquals(savedUser.getName(), testUser.getName());
+        assertEquals(savedUser.getId(), USER_TEST.getId());
+        assertEquals(savedUser.getEmail(), USER_TEST.getEmail());
+        assertEquals(savedUser.getName(), USER_TEST.getName());
     }
 
     @Test
     void findUserTest() {
         when(userRepository.findById(any()))
-                .thenReturn(Optional.ofNullable(testUser));
+                .thenReturn(Optional.ofNullable(USER_TEST));
 
         var getUserResult = userService.findUser(anyLong());
 
-        assertEquals(testUser.getId(), getUserResult.getId());
-        assertEquals(testUser.getName(), getUserResult.getName());
-        assertEquals(testUser.getEmail(), getUserResult.getEmail());
+        assertEquals(USER_TEST.getId(), getUserResult.getId());
+        assertEquals(USER_TEST.getName(), getUserResult.getName());
+        assertEquals(USER_TEST.getEmail(), getUserResult.getEmail());
 
     }
 
     @Test
     void editUserTest() {
         when(userRepository.saveAndFlush(any()))
-                .thenReturn(testUser);
+                .thenReturn(USER_TEST);
         RequestUserDto updatedUser = new RequestUserDto("Updated name",
-                testUser.getEmail(),
-                testUser.getPassword());
+                USER_TEST.getEmail(),
+                USER_TEST.getPassword());
 
-        var user = userService.editUser(testUser, updatedUser);
+        var user = userService.editUser(USER_TEST, updatedUser);
 
         assertEquals(user.getName(), updatedUser.getName());
         assertEquals(user.getEmail(), updatedUser.getEmail());

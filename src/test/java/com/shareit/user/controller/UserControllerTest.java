@@ -1,15 +1,11 @@
 package com.shareit.user.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shareit.user.UserController;
 import com.shareit.user.dto.RequestUserDto;
-import com.shareit.user.dto.ResponseUserDto;
 import com.shareit.user.mapper.UserMapper;
-import com.shareit.user.model.User;
 import com.shareit.user.repository.UserRepository;
 import com.shareit.user.service.UserService;
-import com.shareit.user.utility.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
 
+import static com.shareit.user.utils.UserUtils.REQUEST_USER_DTO_TEST;
+import static com.shareit.user.utils.UserUtils.RESPONSE_USER_DTO_TEST;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -48,29 +46,6 @@ public class UserControllerTest {
     @MockitoBean
     private UserMapper userMapper;
 
-    static final long TEST_USER_ID = 1L;
-
-    private final RequestUserDto testRequestUser = RequestUserDto.builder()
-            .name("testUser")
-            .email("test@gmail.com")
-            .password("testPassword")
-            .build();
-
-    private final ResponseUserDto testResponseUser = ResponseUserDto.builder()
-            .id(TEST_USER_ID)
-            .name(testRequestUser.getName())
-            .email(testRequestUser.getEmail())
-            .build();
-
-
-    private final User testUser = User.builder()
-            .id(1L)
-            .name("testUser")
-            .email("test@gmail.com")
-            .password("testPassword")
-            .userRole(UserRole.USER)
-            .build();
-
 
     @Test
     void findAllUsersTest() throws Exception {
@@ -81,20 +56,20 @@ public class UserControllerTest {
     @Test
     void createUserTest() throws Exception {
         when(userService.createUser(any(RequestUserDto.class)))
-                .thenReturn(testResponseUser);
+                .thenReturn(RESPONSE_USER_DTO_TEST);
 
         mockMvc.perform(post("/users")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(testRequestUser))
+                        .content(mapper.writeValueAsString(REQUEST_USER_DTO_TEST))
 
         ).andExpectAll(
                 status().is2xxSuccessful(),
-                jsonPath("$.id", is(testResponseUser.getId()), Long.class),
-                jsonPath("$.name", is(testResponseUser.getName())),
-                jsonPath("$.email", is(testResponseUser.getEmail()))
+                jsonPath("$.id", is(RESPONSE_USER_DTO_TEST.getId()), Long.class),
+                jsonPath("$.name", is(RESPONSE_USER_DTO_TEST.getName())),
+                jsonPath("$.email", is(RESPONSE_USER_DTO_TEST.getEmail()))
         );
     }
 
