@@ -18,7 +18,7 @@ public interface ItemService {
 
     List<OwnerResponseItemDto> getAllUsersItems(User user, int page, int size);
 
-    List<ResponseSearchItemDto> findItems(String text, int page, int size);
+    List<ResponseSearchItemDto> findItems(String query, int page, int size);
 
     ResponseEntity<HttpStatus> deleteItem(User user, Long itemId);
 

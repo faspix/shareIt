@@ -67,11 +67,11 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ResponseSearchItemDto> findItems(
-           @RequestParam(required = false) String text,
+           @RequestParam(required = false) String query,
            @RequestParam(defaultValue = "0") int page,
            @RequestParam(defaultValue = "30") int size
     ) {
-        return itemService.findItems(text, page, size);
+        return itemService.findItems(query, page, size);
     }
 
     @PostMapping("/{itemId}/comment")

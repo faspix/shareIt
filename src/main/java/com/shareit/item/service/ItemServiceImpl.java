@@ -115,10 +115,10 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public List<ResponseSearchItemDto> findItems(String text, int page, int size) {
+    public List<ResponseSearchItemDto> findItems(String query, int page, int size) {
         Pageable requestPage = makePageRequest(page, size);
         return itemRepository
-                .searchItems(text, requestPage)
+                .searchItems(query, requestPage)
                 .map(ItemMapper::mapItemToResponseSearchItemDto)
                 .toList();
     }
