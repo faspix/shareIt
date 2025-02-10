@@ -38,7 +38,6 @@ public class UserServiceImpl implements UserService {
                             userMapper.mapRequestUserDtoToUser(userDto))
             );
         } catch (DataIntegrityViolationException e) {
-            System.out.println(e);
             throw new UserAlreadyExistException("User with email " + userDto.getEmail() + " already exist");
         }
     }

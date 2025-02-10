@@ -1,5 +1,4 @@
 # ShareIt
-***
 ## Overview
 This web application allows users to rent items.  
 User can add an item he wants to share, find the desired item and rent it for specific period. The service allows user to make a request to book an item for a specific period of time, which can be confirmed or rejected by the owner of the item. After the end of the booking user can leave a feedback.  
@@ -7,7 +6,6 @@ For adding or booking items it is necessary to be authorised, the system is repr
 Unauthorised user can view the list of available items, search through it, as well as view detailed information about a particular item.  
 Owner of the item can also view information about the previous and next booking.
 ## Technologies
-***
 * REST API
 * Spring Boot
 * Spring Security
@@ -17,7 +15,6 @@ Owner of the item can also view information about the previous and next booking.
 * Liquibase 
 * Docker
 ## Available Endpoints:
-***
 ### All endpoints are available at `/api`
 `POST /items` - add item  
 `PATCH /items/{itemId}` - edit item  
@@ -37,6 +34,4 @@ Owner of the item can also view information about the previous and next booking.
 `PATCH /bookings/{bookingId}?approved=true/false` - confirm/reject booking request  
 `GET /bookings/{bookingId}` - view information about booking  
 `GET /bookings?state={booking state}` - view all bookings of the current user  
-`GET /bookings/owner?state={booking state}` - view all bookings for the current user's items  
-
-
+`GET /bookings/owner?state={booking state}` - view all bookings for the current user's items
