@@ -15,7 +15,7 @@ Owner of the item can also view information about the previous and next booking.
 * Liquibase 
 * Docker
 ## Available Endpoints:
-### All endpoints are available at `/api`
+### All endpoints are available at `/swagger-ui/index.html`
 `POST /items` - add item  
 `PATCH /items/{itemId}` - edit item  
 `GET /items/{itemId}` - view information about a specific item  

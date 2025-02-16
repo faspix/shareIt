@@ -34,7 +34,7 @@ public class SecurityConfiguration {
 //                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/**", "/login").permitAll()
+                        .requestMatchers("/login", "/swagger-ui/**", "/v3/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/items/*").permitAll()
                         .anyRequest().authenticated()
