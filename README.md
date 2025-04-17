@@ -1,4 +1,8 @@
 # ShareIt
+
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/66e33c8b4d6340ed8627ebcf531896f3)](https://app.codacy.com/gh/faspix/shareIt/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/66e33c8b4d6340ed8627ebcf531896f3)](https://app.codacy.com/gh/faspix/shareIt/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+
 ## Overview
 This web application allows users to rent items.  
 User can add an item he wants to share, find the desired item and rent it for specific period. The service allows user to make a request to book an item for a specific period of time, which can be confirmed or rejected by the owner of the item. After the end of the booking user can leave a feedback.  

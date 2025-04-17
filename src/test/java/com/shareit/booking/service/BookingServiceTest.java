@@ -1,8 +1,10 @@
 package com.shareit.booking.service;
 
+import com.shareit.booking.dto.ResponseBookingDto;
 import com.shareit.booking.mapper.BookingMapper;
 import com.shareit.booking.model.Booking;
 import com.shareit.booking.repository.BookingRepository;
+import com.shareit.booking.utility.BookingState;
 import com.shareit.booking.utility.BookingStatus;
 import com.shareit.exception.ValidationException;
 import com.shareit.item.service.ItemService;
@@ -13,9 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static com.shareit.booking.utils.BookingUtils.*;
@@ -133,5 +138,176 @@ public class BookingServiceTest {
     }
 
 
+     @Test
+    public void getAllUserBookingsTest_All() {
+        Page<Booking> page = new PageImpl<>(List.of(BOOKING_TEST));
+        when(bookingRepository.getBookingsByBooker(any(), any()))
+                .thenReturn(page);
+
+        List<ResponseBookingDto> result = bookingService.getAllUserBookings(USER_TEST, BookingState.ALL, 0, 10);
+
+        assertEquals(1, result.size());
+        assertEquals(BOOKING_TEST.getId(), result.get(0).getId());
+        assertEquals(BOOKING_TEST.getStatus(), result.get(0).getStatus());
+    }
+
+    @Test
+    public void getAllUserBookingsTest_Current() {
+        Page<Booking> page = new PageImpl<>(List.of(BOOKING_TEST));
+        when(bookingRepository.getBookingsByBookerAndStatusAndStartIsBeforeAndEndIsAfter(any(), any(), any(), any(), any()))
+                .thenReturn(page);
+
+        List<ResponseBookingDto> result = bookingService.getAllUserBookings(USER_TEST, BookingState.CURRENT, 0, 10);
+
+        assertEquals(1, result.size());
+        assertEquals(BOOKING_TEST.getId(), result.get(0).getId());
+        assertEquals(BOOKING_TEST.getStatus(), result.get(0).getStatus());
+    }
+
+    @Test
+    public void getAllUserBookingsTest_Past() {
+        Page<Booking> page = new PageImpl<>(List.of(BOOKING_TEST));
+        when(bookingRepository.getBookingsByBookerAndStatusAndEndIsBefore(any(), any(), any(), any()))
+                .thenReturn(page);
+
+        List<ResponseBookingDto> result = bookingService.getAllUserBookings(USER_TEST, BookingState.PAST, 0, 10);
+
+        assertEquals(1, result.size());
+        assertEquals(BOOKING_TEST.getId(), result.get(0).getId());
+        assertEquals(BOOKING_TEST.getStatus(), result.get(0).getStatus());
+    }
+
+    @Test
+    public void getAllUserBookingsTest_Future() {
+        Page<Booking> page = new PageImpl<>(List.of(BOOKING_TEST));
+        when(bookingRepository.getBookingsByBookerAndStatusAndStartIsAfter(any(), any(), any(), any()))
+                .thenReturn(page);
+
+        List<ResponseBookingDto> result = bookingService.getAllUserBookings(USER_TEST, BookingState.FUTURE, 0, 10);
+
+        assertEquals(1, result.size());
+        assertEquals(BOOKING_TEST.getId(), result.get(0).getId());
+        assertEquals(BOOKING_TEST.getStatus(), result.get(0).getStatus());
+    }
+
+    @Test
+    public void getAllUserBookingsTest_Waiting() {
+        Page<Booking> page = new PageImpl<>(List.of(BOOKING_TEST_APPROVING));
+        when(bookingRepository.getBookingsByBookerAndStatus(any(), any(), any()))
+                .thenReturn(page);
+
+        List<ResponseBookingDto> result = bookingService.getAllUserBookings(USER_TEST, BookingState.WAITING, 0, 10);
+
+        assertEquals(1, result.size());
+        assertEquals(BOOKING_TEST_APPROVING.getId(), result.get(0).getId());
+        assertEquals(BOOKING_TEST_APPROVING.getStatus(), result.get(0).getStatus());
+    }
+
+    @Test
+    public void getAllUserBookingsTest_Rejected() {
+        Booking rejectedBooking = Booking.builder()
+                .id(BOOKING_ID_TEST)
+                .status(BookingStatus.REJECTED)
+                .start(LocalDate.now())
+                .end(LocalDate.now())
+                .booker(USER_TEST)
+                .item(ITEM_TEST)
+                .build();
+        Page<Booking> page = new PageImpl<>(List.of(rejectedBooking));
+        when(bookingRepository.getBookingsByBookerAndStatus(any(), any(), any()))
+                .thenReturn(page);
+
+        List<ResponseBookingDto> result = bookingService.getAllUserBookings(USER_TEST, BookingState.REJECTED, 0, 10);
+
+        assertEquals(1, result.size());
+        assertEquals(rejectedBooking.getId(), result.get(0).getId());
+        assertEquals(rejectedBooking.getStatus(), result.get(0).getStatus());
+    }
+
+    @Test
+    public void getOwnerBookingsTest_All() {
+        Page<Booking> page = new PageImpl<>(List.of(BOOKING_TEST));
+        when(bookingRepository.findBookingsByItemOwner(any(), any()))
+                .thenReturn(page);
+
+        List<ResponseBookingDto> result = bookingService.getOwnerBookings(USER_TEST, BookingState.ALL, 0, 10);
+
+        assertEquals(1, result.size());
+        assertEquals(BOOKING_TEST.getId(), result.get(0).getId());
+        assertEquals(BOOKING_TEST.getStatus(), result.get(0).getStatus());
+    }
+
+    @Test
+    public void getOwnerBookingsTest_Current() {
+        Page<Booking> page = new PageImpl<>(List.of(BOOKING_TEST));
+        when(bookingRepository.findBookingsByItemOwnerAndStatusAndStartIsBeforeAndEndIsAfter(any(), any(), any(), any(), any()))
+                .thenReturn(page);
+
+        List<ResponseBookingDto> result = bookingService.getOwnerBookings(USER_TEST, BookingState.CURRENT, 0, 10);
+
+        assertEquals(1, result.size());
+        assertEquals(BOOKING_TEST.getId(), result.get(0).getId());
+        assertEquals(BOOKING_TEST.getStatus(), result.get(0).getStatus());
+    }
+
+    @Test
+    public void getOwnerBookingsTest_Past() {
+        Page<Booking> page = new PageImpl<>(List.of(BOOKING_TEST));
+        when(bookingRepository.findBookingsByItemOwnerAndStatusAndEndIsBefore(any(), any(), any(), any()))
+                .thenReturn(page);
+
+        List<ResponseBookingDto> result = bookingService.getOwnerBookings(USER_TEST, BookingState.PAST, 0, 10);
+
+        assertEquals(1, result.size());
+        assertEquals(BOOKING_TEST.getId(), result.get(0).getId());
+        assertEquals(BOOKING_TEST.getStatus(), result.get(0).getStatus());
+    }
+
+    @Test
+    public void getOwnerBookingsTest_Future() {
+        Page<Booking> page = new PageImpl<>(List.of(BOOKING_TEST));
+        when(bookingRepository.findBookingsByItemOwnerAndStatusAndStartIsAfter(any(), any(), any(), any()))
+                .thenReturn(page);
+
+        List<ResponseBookingDto> result = bookingService.getOwnerBookings(USER_TEST, BookingState.FUTURE, 0, 10);
+
+        assertEquals(1, result.size());
+        assertEquals(BOOKING_TEST.getId(), result.get(0).getId());
+        assertEquals(BOOKING_TEST.getStatus(), result.get(0).getStatus());
+    }
+
+    @Test
+    public void getOwnerBookingsTest_Waiting() {
+        Page<Booking> page = new PageImpl<>(List.of(BOOKING_TEST_APPROVING));
+        when(bookingRepository.findBookingsByItemOwnerAndStatus(any(), any(), any()))
+                .thenReturn(page);
+
+        List<ResponseBookingDto> result = bookingService.getOwnerBookings(USER_TEST, BookingState.WAITING, 0, 10);
+
+        assertEquals(1, result.size());
+        assertEquals(BOOKING_TEST_APPROVING.getId(), result.get(0).getId());
+        assertEquals(BOOKING_TEST_APPROVING.getStatus(), result.get(0).getStatus());
+    }
+
+    @Test
+    public void getOwnerBookingsTest_Rejected() {
+        Booking rejectedBooking = Booking.builder()
+                .id(BOOKING_ID_TEST)
+                .status(BookingStatus.REJECTED)
+                .start(LocalDate.now())
+                .end(LocalDate.now())
+                .booker(USER_TEST)
+                .item(ITEM_TEST)
+                .build();
+        Page<Booking> page = new PageImpl<>(List.of(rejectedBooking));
+        when(bookingRepository.findBookingsByItemOwnerAndStatus(any(), any(), any()))
+                .thenReturn(page);
+
+        List<ResponseBookingDto> result = bookingService.getOwnerBookings(USER_TEST, BookingState.REJECTED, 0, 10);
+
+        assertEquals(1, result.size());
+        assertEquals(rejectedBooking.getId(), result.get(0).getId());
+        assertEquals(rejectedBooking.getStatus(), result.get(0).getStatus());
+    }
 
 }
