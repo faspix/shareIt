@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Tests with maven
 
 on:
   push:
@@ -30,5 +30,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
 
-    - name: Build and test with Maven
-      run: mvn clean test --batch-mode
+#    - name: Build and test with Maven
+#      run: mvn clean test --batch-mode
+
+    - name: Create coverage reports
+      run: mvn -B verify --file pom.xml
+
+    - name: Run codacy-coverage-reporter
+      uses: codacy/codacy-coverage-reporter-action@v1.3
+      with:
+        coverage-reports: ./target/site/jacoco/jacoco.xml
+        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
