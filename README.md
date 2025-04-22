@@ -2,6 +2,7 @@
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/66e33c8b4d6340ed8627ebcf531896f3)](https://app.codacy.com/gh/faspix/shareIt/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/66e33c8b4d6340ed8627ebcf531896f3)](https://app.codacy.com/gh/faspix/shareIt/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+[![CodeFactor](https://www.codefactor.io/repository/github/faspix/event-hub/badge)](https://www.codefactor.io/repository/github/faspix/event-hub)
 
 ## Overview
 This web application allows users to rent items.  
